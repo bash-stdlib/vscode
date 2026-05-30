@@ -9,10 +9,7 @@ suite("Extension Test Suite", () => {
   };
 
   test("Extension should be present", () => {
-    // Arrange & Act
     const extension = getExtension();
-
-    // Assert
     assert.ok(extension, "Extension should be found by name in packageJSON");
   });
 
@@ -20,15 +17,11 @@ suite("Extension Test Suite", () => {
     let extension: vscode.Extension<any> | undefined;
 
     setup(async () => {
-      // Arrange
       extension = getExtension();
-
-      // Act
       await extension?.activate();
     });
 
     test("it should be active", () => {
-      // Assert
       assert.strictEqual(extension?.isActive, true);
     });
 
@@ -36,14 +29,12 @@ suite("Extension Test Suite", () => {
       let completions: vscode.CompletionList | undefined;
 
       setup(async () => {
-        // Arrange
         const document = await vscode.workspace.openTextDocument({
           language: "shellscript",
           content: "stdlib.",
         });
         const position = new vscode.Position(0, 7);
 
-        // Act
         completions = await vscode.commands.executeCommand<vscode.CompletionList>(
           "vscode.executeCompletionItemProvider",
           document.uri,
@@ -52,7 +43,6 @@ suite("Extension Test Suite", () => {
       });
 
       test("it should return a completion list", () => {
-        // Assert
         assert.ok(completions, "Completion list should be returned");
       });
     });
