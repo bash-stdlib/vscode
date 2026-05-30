@@ -1,0 +1,70 @@
+{
+  "name": "bash-stdlib",
+  "displayName": "bash-stdlib",
+  "description": "Code completion for the bash stdlib library.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.118.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:shellscript"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Bash STDLIB",
+      "properties": {
+        "bash-stdlib.documentationLanguage": {
+          "type": "string",
+          "default": "en",
+          "enum": [
+            "en"
+          ],
+          "enumDescriptions": [
+            "English documentation"
+          ],
+          "description": "The language code for the documentation."
+        },
+        "bash-stdlib.debug": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable debug logging for completion provider activity in the debug console."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "bash-stdlib.helloWorld",
+        "title": "Hello World"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./ && tsc-alias && rsync -am --include='*/' --include='assets/***' --exclude='*' src/ out/",
+    "watch": "concurrently --prefix none \"tsc-alias -w\" \"tsc -w\" ",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.19.17",
+    "@types/vscode": "^1.118.0",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
+    "concurrently": "^10.0.0",
+    "eslint": "^9.39.3",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-unused-imports": "^4.4.1",
+    "prettier": "^3.8.3",
+    "tsc-alias": "^1.8.17",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.1"
+  }
+}
