@@ -26,18 +26,6 @@ suite("Fetcher Test Suite", () => {
         assert.strictEqual(urls.testing, "https://bash-stdlib.readthedocs.io/en/latest/reference_testing/src/testing/REFERENCE_COMPLETE.html");
       });
     });
-
-    suite("when language is French", () => {
-      let urls: DocumentationUrls;
-
-      setup(() => {
-        urls = fetcher.getUrls("fr");
-      });
-
-      test("it should return correct normal URL", () => {
-        assert.strictEqual(urls.normal, "https://bash-stdlib.readthedocs.io/fr/latest/reference/src/REFERENCE_COMPLETE.html");
-      });
-    });
   });
 
   suite("when fetching documentation succeeds", () => {

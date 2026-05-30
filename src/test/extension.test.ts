@@ -45,6 +45,18 @@ suite("Extension Test Suite", () => {
       test("it should return a completion list", () => {
         assert.ok(completions, "Completion list should be returned");
       });
+
+      test("it should contain function items", () => {
+        const hasFunctions = completions?.items.some(
+          (item) => item.kind === vscode.CompletionItemKind.Function
+        );
+        assert.strictEqual(hasFunctions, true, "Completion list should contain function items");
+      });
+
+      test("it should have completion items with documentation", () => {
+          const itemsWithDoc = completions?.items.filter(item => item.documentation);
+          assert.ok(itemsWithDoc && itemsWithDoc.length > 0, "Should have items with documentation");
+      });
     });
   });
 });
