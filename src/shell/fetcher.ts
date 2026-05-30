@@ -1,16 +1,30 @@
 import * as vscode from "vscode";
-import { BASH_STDLIB_PREFIX, FETCH_ERROR_MESSAGE } from "@/shell/constants";
+import { MESSAGE_PREFIX, ERROR_FETCH_FAILED, URL_STANDARD_DOC_TEMPLATE, URL_TESTING_DOC_TEMPLATE } from "@/constants";
 
-export async function fetchDocumentation(url: string): Promise<string> {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`${FETCH_ERROR_MESSAGE} from ${url}: ${response.statusText} (${response.status})`);
+export interface DocumentationUrls {
+  normal: string;
+  testing: string;
+}
+
+export class DocumentationFetcher {
+  public getUrls(language: string): DocumentationUrls {
+    return {
+      normal: URL_STANDARD_DOC_TEMPLATE.replace("{lang}", language),
+      testing: URL_TESTING_DOC_TEMPLATE.replace("{lang}", language),
+    };
+  }
+
+  public async fetch(url: string): Promise<string> {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`${ERROR_FETCH_FAILED} from ${url}: ${response.statusText} (${response.status})`);
+      }
+      return await response.text();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      vscode.window.showErrorMessage(`${MESSAGE_PREFIX} ${message}`);
+      throw error;
     }
-    return await response.text();
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    vscode.window.showErrorMessage(`${BASH_STDLIB_PREFIX} ${message}`);
-    throw error;
   }
 }

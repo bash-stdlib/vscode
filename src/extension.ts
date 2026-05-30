@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
 import { ShdocFunction } from "@/shell/shdoc";
-import { fetchDocumentation } from "@/shell/fetcher";
-import { getDocumentationUrls } from "@/shell/constants";
+import { DocumentationFetcher } from "@/shell/fetcher";
 import { HtmlDocumentationParser } from "@/shell/htmlParser";
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -11,10 +10,12 @@ export async function activate(context: vscode.ExtensionContext) {
   const language = config.get<string>("documentationLanguage") || "en";
 
   try {
-    const urls = getDocumentationUrls(language);
+    const fetcher = new DocumentationFetcher();
+    const urls = fetcher.getUrls(language);
+
     const [normalHtml, testingHtml] = await Promise.all([
-      fetchDocumentation(urls.normal),
-      fetchDocumentation(urls.testing),
+      fetcher.fetch(urls.normal),
+      fetcher.fetch(urls.testing),
     ]);
 
     const parser = new HtmlDocumentationParser();

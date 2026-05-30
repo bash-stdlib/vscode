@@ -1,9 +1,10 @@
 import { ShdocFunction, ShdocArg, ShdocExitCode } from "@/shell/shdoc";
+import { MESSAGE_NO_DESCRIPTION } from "@/constants";
 
 export class HtmlDocumentationParser {
   protected readonly sectionIdPrefix = '<section id="stdlib-';
   protected readonly permalinkSymbol = "";
-  protected readonly noDescriptionMessage = "No description provided.";
+  protected readonly noDescriptionMessage = MESSAGE_NO_DESCRIPTION;
 
   public parse(html: string): ShdocFunction[] {
     const rawSections = html.split(this.sectionIdPrefix);
