@@ -1,0 +1,57 @@
+[
+  {
+    "pattern": ["error.sh", "error2.sh"],
+    "stdout": [
+      {
+        "range": {
+          "start": { "line": 0, "character": 0 },
+          "end": { "line": 0, "character": 5 }
+        },
+        "severity": 1,
+        "code": "STD001",
+        "source": "bash-stdlib-lint",
+        "message": "Error in file 1",
+        "file": "error.sh"
+      },
+      {
+        "range": {
+          "start": { "line": 1, "character": 0 },
+          "end": { "line": 1, "character": 5 }
+        },
+        "severity": 1,
+        "code": "STD002",
+        "source": "bash-stdlib-lint",
+        "message": "Error in file 2",
+        "file": "error2.sh"
+      }
+    ],
+    "stderr": ""
+  },
+  {
+    "pattern": ["success.sh"],
+    "stdout": [],
+    "stderr": ""
+  },
+  {
+    "pattern": ["error.sh"],
+    "stdout": [
+      {
+        "range": {
+          "start": { "line": 0, "character": 0 },
+          "end": { "line": 0, "character": 5 }
+        },
+        "severity": 1,
+        "code": "STD001",
+        "source": "bash-stdlib-lint",
+        "message": "Test error message",
+        "file": "error.sh"
+      }
+    ],
+    "stderr": ""
+  },
+  {
+    "pattern": ["mixed_output.sh"],
+    "stdout": "\n Fetching documentation to build cache...\n[\n    {\n        \"range\": {\n            \"start\": { \"line\": 1, \"character\": 2 },\n            \"end\": { \"line\": 1, \"character\": 10 }\n        },\n        \"severity\": 1,\n        \"code\": \"STD002\",\n        \"source\": \"bash-stdlib-lint\",\n        \"message\": \"Mixed output error\",\n        \"file\": \"mixed_output.sh\"\n    }\n]\nCache saved to .bash_stdlib_cache.json\n",
+    "stderr": ""
+  }
+]
