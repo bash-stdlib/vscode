@@ -14,6 +14,16 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "Bash STDLIB",
+      "properties": {
+        "bash-stdlib.documentationLanguage": {
+          "type": "string",
+          "default": "en",
+          "description": "The language code for the documentation (e.g., 'en', 'fr')."
+        }
+      }
+    },
     "commands": [
       {
         "command": "bash-stdlib.helloWorld",
@@ -31,6 +41,7 @@
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^22.19.17",
     "@types/vscode": "^1.118.0",
     "@vscode/test-cli": "^0.0.12",
