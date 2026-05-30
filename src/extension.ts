@@ -1,7 +1,8 @@
 import * as vscode from "vscode";
-import { ShdocFunction } from "./shell/shdoc";
-import { fetchDocumentation, getDocumentationUrls } from "./shell/fetcher";
-import { HtmlDocumentationParser } from "./shell/htmlParser";
+import { ShdocFunction } from "@/shell/shdoc";
+import { fetchDocumentation } from "@/shell/fetcher";
+import { getDocumentationUrls } from "@/shell/constants";
+import { HtmlDocumentationParser } from "@/shell/htmlParser";
 
 export async function activate(context: vscode.ExtensionContext) {
   let functions: ShdocFunction[] = [];

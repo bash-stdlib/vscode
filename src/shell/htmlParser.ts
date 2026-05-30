@@ -1,9 +1,9 @@
-import { ShdocFunction, ShdocArg, ShdocExitCode } from "./shdoc";
+import { ShdocFunction, ShdocArg, ShdocExitCode } from "@/shell/shdoc";
 
 export class HtmlDocumentationParser {
-  private readonly sectionIdPrefix = '<section id="stdlib-';
-  private readonly permalinkSymbol = "";
-  private readonly noDescriptionMessage = "No description provided.";
+  protected readonly sectionIdPrefix = '<section id="stdlib-';
+  protected readonly permalinkSymbol = "";
+  protected readonly noDescriptionMessage = "No description provided.";
 
   public parse(html: string): ShdocFunction[] {
     const rawSections = html.split(this.sectionIdPrefix);
@@ -14,7 +14,7 @@ export class HtmlDocumentationParser {
       .filter((parsedFunction): parsedFunction is ShdocFunction => parsedFunction !== null);
   }
 
-  private parseFunctionSection(sectionHtml: string): ShdocFunction | null {
+  protected parseFunctionSection(sectionHtml: string): ShdocFunction | null {
     const functionName = this.extractFunctionName(sectionHtml);
     if (!functionName) {
       return null;
@@ -29,7 +29,7 @@ export class HtmlDocumentationParser {
     };
   }
 
-  private extractFunctionName(sectionHtml: string): string | null {
+  protected extractFunctionName(sectionHtml: string): string | null {
     const h3NameMatch = sectionHtml.match(/<h3>([^<]+)/);
     if (!h3NameMatch) {
       return null;
@@ -38,14 +38,14 @@ export class HtmlDocumentationParser {
     return h3NameMatch[1].trim().replace(this.permalinkSymbol, "").trim();
   }
 
-  private extractDescription(sectionHtml: string): string {
+  protected extractDescription(sectionHtml: string): string {
     const firstParagraphAfterHeaderMatch = sectionHtml.match(/<\/h3>\s*<p>([\s\S]+?)<\/p>/);
     const rawDescription = firstParagraphAfterHeaderMatch ? firstParagraphAfterHeaderMatch[1].trim() : this.noDescriptionMessage;
 
     return this.sanitizeText(rawDescription);
   }
 
-  private extractArguments(sectionHtml: string): ShdocArg[] {
+  protected extractArguments(sectionHtml: string): ShdocArg[] {
     const args: ShdocArg[] = [];
     const argumentsSectionPattern = /<section id="(?:arguments|id\d+)">\s*<h4>Arguments[\s\S]+?<ul[^>]*>([\s\S]+?)<\/ul>/;
     const argumentsSectionMatch = sectionHtml.match(argumentsSectionPattern);
@@ -67,7 +67,7 @@ export class HtmlDocumentationParser {
     return args;
   }
 
-  private extractExitCodes(sectionHtml: string): ShdocExitCode[] {
+  protected extractExitCodes(sectionHtml: string): ShdocExitCode[] {
     const exitCodes: ShdocExitCode[] = [];
     const exitCodesSectionPattern = /<section id="(?:exit-codes|id\d+)">\s*<h4>Exit codes[\s\S]+?<ul[^>]*>([\s\S]+?)<\/ul>/;
     const exitCodesSectionMatch = sectionHtml.match(exitCodesSectionPattern);
@@ -88,7 +88,7 @@ export class HtmlDocumentationParser {
     return exitCodes;
   }
 
-  private sanitizeText(htmlContent: string): string {
+  protected sanitizeText(htmlContent: string): string {
     const textWithoutTags = htmlContent.replace(/<[^>]+>/g, "");
     const normalizedWhitespace = textWithoutTags.replace(/\s+/g, " ");
 

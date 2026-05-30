@@ -1,13 +1,15 @@
 import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
-import { HtmlDocumentationParser } from "../shell/htmlParser";
-import { ShdocFunction } from "../shell/shdoc";
+import { HtmlDocumentationParser } from "@/shell/htmlParser";
+import { ShdocFunction } from "@/shell/shdoc";
 
 suite("HTML Parser Test Suite", () => {
   const parser = new HtmlDocumentationParser();
 
   const loadAsset = (filename: string): string => {
+    // Assets are copied to out/shell/test/assets/ during build
+    // This test file will be at out/shell/test/parser.test.js
     const filePath = path.join(__dirname, "assets", filename);
     return fs.readFileSync(filePath, "utf8");
   };

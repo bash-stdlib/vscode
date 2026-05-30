@@ -33,7 +33,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./ && mkdir -p out/test/assets && cp src/test/assets/*.html out/test/assets/",
+    "compile": "tsc -p ./ && tsc-alias && mkdir -p out/shell/test/assets && cp src/shell/test/assets/*.html out/shell/test/assets/",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
@@ -47,6 +47,8 @@
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2",
     "eslint": "^9.39.3",
+    "tsc-alias": "^1.8.17",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1"
   }

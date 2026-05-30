@@ -1,12 +1,12 @@
 export interface ShdocArg {
+  desc: string;
   name: string;
   type: string;
-  desc: string;
 }
 
 export interface ShdocOption {
-  flags: string;
   desc: string;
+  flags: string;
 }
 
 export interface ShdocExitCode {
@@ -15,9 +15,9 @@ export interface ShdocExitCode {
 }
 
 export interface ShdocFunction {
-  name: string;
-  description: string;
   args: ShdocArg[];
-  options: ShdocOption[];
+  description: string;
   exitcodes: ShdocExitCode[];
+  name: string;
+  options: ShdocOption[];
 }
