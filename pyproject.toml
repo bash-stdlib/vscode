@@ -1,0 +1,26 @@
+[build-system]
+build-backend = 'poetry.core.masonry.api'
+requires = ['poetry-core>=2.0.0,<3.0.0']
+
+[dependency-groups]
+dev = ['commitizen (>=4.16.3,<5.0.0)', 'pre-commit (>=4.6.0,<5.0.0)']
+
+[project]
+dependencies = []
+description = ''
+name = 'bash-stdlib'
+readme = 'README.md'
+requires-python = '>=3.10'
+version = '0.1.0'
+
+[[project.authors]]
+email = '9848926+niall-byrne@users.noreply.github.com'
+name = 'Niall Byrne'
+
+[tool]
+[tool.commitizen]
+bump_message = 'bump(RELEASE): $current_version → $new_version'
+pre_bump_hooks = ['poetry run pre-commit run --hook-stage=manual commitizen-pre-bump --files pyproject.toml -c .cicd-tools/configuration/pre-commit-bootstrap.yaml || true']
+version = '0.1.0'
+version_files = ['pyproject.toml:version']
+version_provider = 'poetry'
