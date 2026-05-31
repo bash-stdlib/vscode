@@ -6,10 +6,13 @@ export function debug(message: string, data?: unknown): void {
 
   if (debugEnabled) {
     if (data !== undefined) {
-      console.log(`[stdlib-completion] ${message}`, data);
+      debug.logger(`[stdlib-completion] ${message}`, data);
     } else {
-      console.log(`[stdlib-completion] ${message}`);
+      debug.logger(`[stdlib-completion] ${message}`);
     }
   }
 }
 
+export namespace debug {
+  export let logger = console.log;
+}
