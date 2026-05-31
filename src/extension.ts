@@ -1,17 +1,27 @@
 import * as vscode from "vscode";
-import * as path from "path";
-import { loadAllScriptsFromDirectory } from "./shell/loadScript";
-import { extractShdocFunctions, ShdocFunction } from "./shell/shdoc";
+import { ShdocFunction } from "@/shell/shdoc";
+import { DocumentationFetcher } from "@/shell/fetcher";
+import { HtmlDocumentationParser } from "@/shell/htmlParser";
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   let functions: ShdocFunction[] = [];
 
+  const config = vscode.workspace.getConfiguration("bash-stdlib");
+  const language = config.get<string>("documentationLanguage") || "en";
+
   try {
-    const scriptsDir = path.join(context.extensionPath, "..", "stdlib", "src");
-    const allScriptsText = loadAllScriptsFromDirectory(scriptsDir);
-    functions = extractShdocFunctions(allScriptsText);
+    const fetcher = new DocumentationFetcher();
+    const urls = fetcher.getUrls(language);
+
+    const [normalHtml, testingHtml] = await Promise.all([
+      fetcher.fetch(urls.normal),
+      fetcher.fetch(urls.testing),
+    ]);
+
+    const parser = new HtmlDocumentationParser();
+    functions = [...parser.parse(normalHtml), ...parser.parse(testingHtml)];
   } catch (error) {
-    console.error("Failed to load or parse external script:", error);
+    console.error("Failed to load or parse documentation:", error);
   }
 
   const provider = vscode.languages.registerCompletionItemProvider(

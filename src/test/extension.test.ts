@@ -1,15 +1,62 @@
 import * as assert from "assert";
-
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
 import * as vscode from "vscode";
-// import * as myExtension from '../../extension';
 
-describe("Extension Test Suite", () => {
+suite("Extension Test Suite", () => {
   vscode.window.showInformationMessage("Start all tests.");
 
-  test("Sample test", () => {
-    assert.strictEqual(-1, [1, 2, 3].indexOf(5));
-    assert.strictEqual(-1, [1, 2, 3].indexOf(0));
+  const getExtension = () => {
+    return vscode.extensions.all.find((e) => e.packageJSON.name === "bash-stdlib");
+  };
+
+  test("Extension should be present", () => {
+    const extension = getExtension();
+    assert.ok(extension, "Extension should be found by name in packageJSON");
+  });
+
+  suite("when extension is activated", () => {
+    let extension: vscode.Extension<any> | undefined;
+
+    setup(async () => {
+      extension = getExtension();
+      await extension?.activate();
+    });
+
+    test("it should be active", () => {
+      assert.strictEqual(extension?.isActive, true);
+    });
+
+    suite("when completions are requested for shellscript", () => {
+      let completions: vscode.CompletionList | undefined;
+
+      setup(async () => {
+        const document = await vscode.workspace.openTextDocument({
+          language: "shellscript",
+          content: "stdlib.",
+        });
+        const position = new vscode.Position(0, 7);
+
+        completions = await vscode.commands.executeCommand<vscode.CompletionList>(
+          "vscode.executeCompletionItemProvider",
+          document.uri,
+          position
+        );
+      });
+
+      test("it should return a completion list", () => {
+        assert.ok(completions, "Completion list should be returned");
+      });
+
+      test("it should contain function items", () => {
+        const hasFunctions = completions?.items.some(
+          (item) => item.kind === vscode.CompletionItemKind.Function
+        );
+        assert.strictEqual(hasFunctions, true, "Completion list should contain function items");
+      });
+
+      test("it should have completion items with documentation", () => {
+          const itemsWithDoc = completions?.items.filter(item => item.documentation);
+          assert.ok(itemsWithDoc && itemsWithDoc.length > 0, "Should have items with documentation");
+      });
+    });
   });
 });
