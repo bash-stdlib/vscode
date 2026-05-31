@@ -172,11 +172,12 @@ suite("Extension Test Suite", () => {
             });
             const position = new vscode.Position(0, 3);
 
-            completions = await vscode.commands.executeCommand<vscode.CompletionList>(
-              "vscode.executeCompletionItemProvider",
-              document.uri,
-              position,
-            );
+            completions =
+              await vscode.commands.executeCommand<vscode.CompletionList>(
+                "vscode.executeCompletionItemProvider",
+                document.uri,
+                position,
+              );
           });
 
           test("it should return _testing namespace", () => {
@@ -207,11 +208,12 @@ suite("Extension Test Suite", () => {
             });
             const position = new vscode.Position(0, 2);
 
-            completions = await vscode.commands.executeCommand<vscode.CompletionList>(
-              "vscode.executeCompletionItemProvider",
-              document.uri,
-              position,
-            );
+            completions =
+              await vscode.commands.executeCommand<vscode.CompletionList>(
+                "vscode.executeCompletionItemProvider",
+                document.uri,
+                position,
+              );
           });
 
           test("it should return _mock namespace", () => {
@@ -225,7 +227,10 @@ suite("Extension Test Suite", () => {
             const mockItem = completions?.items.find(
               (item) => item.label === "_mock",
             );
-            assert.strictEqual(mockItem?.kind, vscode.CompletionItemKind.Module);
+            assert.strictEqual(
+              mockItem?.kind,
+              vscode.CompletionItemKind.Module,
+            );
           });
         });
 
@@ -239,11 +244,12 @@ suite("Extension Test Suite", () => {
             });
             const position = new vscode.Position(0, 3);
 
-            completions = await vscode.commands.executeCommand<vscode.CompletionList>(
-              "vscode.executeCompletionItemProvider",
-              document.uri,
-              position,
-            );
+            completions =
+              await vscode.commands.executeCommand<vscode.CompletionList>(
+                "vscode.executeCompletionItemProvider",
+                document.uri,
+                position,
+              );
           });
 
           test("it should return stdlib namespace", () => {
@@ -257,7 +263,10 @@ suite("Extension Test Suite", () => {
             const stdlibItem = completions?.items.find(
               (item) => item.label === "stdlib",
             );
-            assert.strictEqual(stdlibItem?.kind, vscode.CompletionItemKind.Module);
+            assert.strictEqual(
+              stdlibItem?.kind,
+              vscode.CompletionItemKind.Module,
+            );
           });
         });
       });

@@ -101,8 +101,13 @@ export class HtmlDocumentationParser {
       const argMatches = listItemsHtml.matchAll(argListItemPattern);
 
       for (const match of argMatches) {
+        let argName = match[1].trim();
+        // Convert ellipsis to standard notation for display
+        if (argName === "…") {
+          argName = "...";
+        }
         args.push({
-          name: match[1].trim(),
+          name: argName,
           type: match[2].trim(),
           desc: this.sanitizeText(match[3]),
         });

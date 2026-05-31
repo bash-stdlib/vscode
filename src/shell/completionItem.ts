@@ -31,7 +31,9 @@ export function createFunctionCompletionItem(
     completionItem.sortText = `${parsedFunction.namespace}_${parsedFunction.name}`;
   }
 
-  const argSignature = parsedFunction.args.map((a) => a.name).join(" ");
+  // Filter out variadic arguments (...) from the detail signature
+  const regularArgs = parsedFunction.args.filter((a) => a.name !== "...");
+  const argSignature = regularArgs.map((a) => a.name).join(" ");
   completionItem.detail = `${displayName} ${argSignature}`.trim();
 
   completionItem.documentation = buildFunctionDocumentation(parsedFunction);
@@ -86,12 +88,16 @@ function createSnippetText(
   parsedFunction: ShdocFunction,
 ): string | vscode.SnippetString {
   if (parsedFunction.args && parsedFunction.args.length > 0) {
-    const snippetArgs = parsedFunction.args
-      .map((arg, index) => {
-        return `\${${index + 1}:${arg.name}}`;
-      })
-      .join(" ");
-    return new vscode.SnippetString(`${parsedFunction.name} ${snippetArgs}`);
+    // Filter out variadic arguments (...) from snippet
+    const regularArgs = parsedFunction.args.filter((arg) => arg.name !== "...");
+    if (regularArgs.length > 0) {
+      const snippetArgs = regularArgs
+        .map((arg, index) => {
+          return `\${${index + 1}:${arg.name}}`;
+        })
+        .join(" ");
+      return new vscode.SnippetString(`${parsedFunction.name} ${snippetArgs}`);
+    }
   }
 
   return parsedFunction.name;

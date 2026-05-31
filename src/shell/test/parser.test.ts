@@ -163,6 +163,15 @@ suite("HTML Parser Test Suite", () => {
       assert.strictEqual(fn.namespace, "_testing");
     });
 
+    test("it should skip variadic ellipsis arguments from the args list", () => {
+      const fn = functions.find((f) => f.name === "error");
+      assert.ok(fn);
+      // The _testing.error function has variadic args (...), which are converted
+      // and kept in the args list for documentation purposes
+      assert.strictEqual(fn.args.length, 1);
+      assert.strictEqual(fn.args[0].name, "...");
+    });
+
     test("it should correctly extract @parametrize and assign it to no namespace if it has no dot", () => {
       const fn = functions.find((f) => f.name === "@parametrize");
       assert.ok(fn);
