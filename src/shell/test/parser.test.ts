@@ -138,4 +138,35 @@ suite("HTML Parser Test Suite", () => {
       assert.strictEqual(firstFunction.exitcodes[0].code, "0");
     });
   });
+
+  suite("when parsing testing library functions", () => {
+    let functions: ShdocFunction[];
+
+    setup(() => {
+      const html = loadAsset("testing_functions.html");
+      functions = parser.parse(html);
+    });
+
+    test("it should extract three functions", () => {
+      assert.strictEqual(functions.length, 3);
+    });
+
+    test("it should correctly extract assert_is_array and assign it to the root namespace", () => {
+      const fn = functions.find((f) => f.name === "assert_is_array");
+      assert.ok(fn);
+      assert.strictEqual(fn.namespace, "");
+    });
+
+    test("it should correctly extract _testing.error and assign it to _testing namespace", () => {
+      const fn = functions.find((f) => f.name === "error");
+      assert.ok(fn);
+      assert.strictEqual(fn.namespace, "_testing");
+    });
+
+    test("it should correctly extract @parametrize and assign it to no namespace if it has no dot", () => {
+      const fn = functions.find((f) => f.name === "@parametrize");
+      assert.ok(fn);
+      assert.strictEqual(fn.namespace, "");
+    });
+  });
 });

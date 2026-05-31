@@ -55,6 +55,18 @@ suite("Completion Logic Test Suite", () => {
         assert.strictEqual(result.endsWithDot, false);
       });
     });
+
+    suite("when line text ends with @ symbol", () => {
+      let result: { namespace: string; endsWithDot: boolean };
+
+      setup(() => {
+        result = extractNamespacePrefixFromLineText("@para");
+      });
+
+      test("it should identify the namespace including @", () => {
+        assert.strictEqual(result.namespace, "@para");
+      });
+    });
   });
 
   suite("getNextNamespaceLevels", () => {

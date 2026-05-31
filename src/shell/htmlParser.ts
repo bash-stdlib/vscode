@@ -2,22 +2,37 @@ import { ShdocFunction, ShdocArg, ShdocExitCode } from "@/shell/shdoc";
 import { MESSAGE_NO_DESCRIPTION } from "@/constants";
 
 export class HtmlDocumentationParser {
-  protected readonly sectionIdPrefix = '<section id="stdlib-';
   protected readonly permalinkSymbol = "";
   protected readonly noDescriptionMessage = MESSAGE_NO_DESCRIPTION;
 
   public parse(html: string): ShdocFunction[] {
-    const rawSections = html.split(this.sectionIdPrefix);
-    const potentialFunctionSections = rawSections.slice(1);
+    const sections = this.splitIntoSections(html);
 
-    return potentialFunctionSections
-      .map((sectionContent) =>
-        this.parseFunctionSection(this.sectionIdPrefix + sectionContent),
-      )
+    return sections
+      .map((sectionContent) => this.parseFunctionSection(sectionContent))
       .filter(
         (parsedFunction): parsedFunction is ShdocFunction =>
           parsedFunction !== null,
       );
+  }
+
+  protected splitIntoSections(html: string): string[] {
+    const functionSectionRegex = /<section id="[^"]+">\s*<h3>/g;
+    const sections: string[] = [];
+    let match;
+    const indices: number[] = [];
+
+    while ((match = functionSectionRegex.exec(html)) !== null) {
+      indices.push(match.index);
+    }
+
+    for (let i = 0; i < indices.length; i++) {
+      const start = indices[i];
+      const end = i + 1 < indices.length ? indices[i + 1] : html.length;
+      sections.push(html.substring(start, end));
+    }
+
+    return sections;
   }
 
   protected parseFunctionSection(sectionHtml: string): ShdocFunction | null {

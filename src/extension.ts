@@ -80,9 +80,7 @@ function createCompletionProvider(
         return createNamespacedCompletions(functions, namespace);
       }
 
-      return getFunctionsInNamespace(functions, namespace).map((fn) =>
-        createFunctionCompletionItem(fn),
-      );
+      return createNamespacedCompletions(functions, namespace);
     },
   };
 }
@@ -102,7 +100,7 @@ function createNamespacedCompletions(
     completions.push(createFunctionCompletionItem(fn));
   });
 
-  debug(`Returning ${completions.length} completions`);
+  debug(`Returning ${completions.length} completions for namespace: "${namespace}"`);
   return completions;
 }
 

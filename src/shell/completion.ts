@@ -5,7 +5,7 @@ export function extractNamespacePrefixFromLineText(lineText: string): {
   namespace: string;
   endsWithDot: boolean;
 } {
-  const match = lineText.match(/([\w.]+)\.?$/);
+  const match = lineText.match(/([@\w.]+)\.?$/);
   if (!match) {
     return { namespace: "", endsWithDot: false };
   }
@@ -22,12 +22,15 @@ export function getNextNamespaceLevels(
   functions: ShdocFunction[],
   currentNamespace: string,
 ): { [key: string]: string } {
-  const prefix = currentNamespace + ".";
+  const prefix = currentNamespace ? currentNamespace + "." : "";
   const levels: { [key: string]: string } = {};
 
   functions.forEach((fn) => {
     const fullNamespace = fn.namespace || "";
-    if (fullNamespace.startsWith(prefix)) {
+    if (prefix === "" && fullNamespace !== "") {
+      const nextLevel = fullNamespace.split(".")[0];
+      levels[nextLevel] = nextLevel;
+    } else if (prefix !== "" && fullNamespace.startsWith(prefix)) {
       const remaining = fullNamespace.slice(prefix.length);
       const nextLevel = remaining.split(".")[0];
       if (nextLevel) {
