@@ -20,7 +20,9 @@
         "bash-stdlib.documentationLanguage": {
           "type": "string",
           "default": "en",
-          "enum": ["en"],
+          "enum": [
+            "en"
+          ],
           "enumDescriptions": [
             "English documentation"
           ],

@@ -28,11 +28,18 @@ suite("HTML Parser Test Suite", () => {
     });
 
     test("it should correctly extract the function name", () => {
-      assert.strictEqual(firstFunction.name, "stdlib.array.assert.is_array");
+      assert.strictEqual(firstFunction.name, "is_array");
+    });
+
+    test("it should correctly extract the namespace", () => {
+      assert.strictEqual(firstFunction.namespace, "stdlib.array.assert");
     });
 
     test("it should correctly extract the function description", () => {
-      assert.strictEqual(firstFunction.description, "Asserts that a variable is an array.");
+      assert.strictEqual(
+        firstFunction.description,
+        "Asserts that a variable is an array.",
+      );
     });
 
     test("it should extract one argument", () => {
@@ -48,7 +55,10 @@ suite("HTML Parser Test Suite", () => {
     });
 
     test("it should correctly extract the first argument's description", () => {
-      assert.strictEqual(firstFunction.args[0].desc, "The name of the variable to check.");
+      assert.strictEqual(
+        firstFunction.args[0].desc,
+        "The name of the variable to check.",
+      );
     });
 
     test("it should extract three exit codes", () => {
@@ -60,7 +70,10 @@ suite("HTML Parser Test Suite", () => {
     });
 
     test("it should correctly extract the first exit code's description", () => {
-      assert.strictEqual(firstFunction.exitcodes[0].desc, "If the assertion succeeded.");
+      assert.strictEqual(
+        firstFunction.exitcodes[0].desc,
+        "If the assertion succeeded.",
+      );
     });
   });
 
@@ -78,11 +91,19 @@ suite("HTML Parser Test Suite", () => {
     });
 
     test("it should correctly extract the first function name", () => {
-      assert.strictEqual(functions[0].name, "stdlib.array.assert.is_array");
+      assert.strictEqual(functions[0].name, "is_array");
+    });
+
+    test("it should correctly extract the first function namespace", () => {
+      assert.strictEqual(functions[0].namespace, "stdlib.array.assert");
     });
 
     test("it should correctly extract the second function name", () => {
-      assert.strictEqual(functions[1].name, "stdlib.array.assert.is_contains");
+      assert.strictEqual(functions[1].name, "is_contains");
+    });
+
+    test("it should correctly extract the second function namespace", () => {
+      assert.strictEqual(functions[1].namespace, "stdlib.array.assert");
     });
   });
 

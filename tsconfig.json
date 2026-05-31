@@ -6,9 +6,8 @@
     "lib": ["ES2022"],
     "sourceMap": true,
     "rootDir": "src",
-    "baseUrl": "./src",
     "paths": {
-      "@/*": ["*"]
+      "@/*": ["./src/*"]
     },
     "strict": true /* enable all strict type-checking options */,
     "esModuleInterop": true,

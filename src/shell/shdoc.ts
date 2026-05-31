@@ -20,4 +20,5 @@ export interface ShdocFunction {
   exitcodes: ShdocExitCode[];
   name: string;
   options: ShdocOption[];
+  namespace?: string;
 }

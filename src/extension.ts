@@ -29,15 +29,24 @@ export async function activate(context: vscode.ExtensionContext) {
     {
       provideCompletionItems(document, position) {
         return functions.map((parsedFunction) => {
+          // Use namespace.function format for display, but function name for insertion
+          const displayName = parsedFunction.namespace
+            ? `${parsedFunction.namespace}.${parsedFunction.name}`
+            : parsedFunction.name;
+
           const completionItem = new vscode.CompletionItem(
-            parsedFunction.name,
+            displayName,
             vscode.CompletionItemKind.Function,
           );
 
+          // Set sort text to namespace for better grouping
+          if (parsedFunction.namespace) {
+            completionItem.sortText = `${parsedFunction.namespace}_${parsedFunction.name}`;
+          }
+
           // 1. Signature Details
           const argSignature = parsedFunction.args.map((a) => a.name).join(" ");
-          completionItem.detail =
-            `${parsedFunction.name} ${argSignature}`.trim();
+          completionItem.detail = `${displayName} ${argSignature}`.trim();
 
           // 2. Build Markdown Documentation Tooltip
           const markdown = new vscode.MarkdownString();
@@ -87,10 +96,10 @@ export async function activate(context: vscode.ExtensionContext) {
               })
               .join(" ");
             completionItem.insertText = new vscode.SnippetString(
-              `${parsedFunction.name} ${snippetArgs}`,
+              `${displayName} ${snippetArgs}`,
             );
           } else {
-            completionItem.insertText = parsedFunction.name;
+            completionItem.insertText = displayName;
           }
 
           console.log(completionItem.documentation);
