@@ -1,0 +1,78 @@
+---
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+repos:
+  - repo: https://github.com/adrienverge/yamllint.git
+    rev: v1.32.0
+    hooks:
+      - id: yamllint
+        args:
+          - "-c"
+          - "./.yamllint.yml"
+        stages: [pre-commit]
+  - repo: https://github.com/cicd-tools-org/pre-commit.git
+    rev: 0.6.0
+    hooks:
+      - id: format-shell
+        args:
+          - "-w"
+          - "--indent=2"
+          - "-ci"
+          - "-sr"
+      - id: format-toml
+      - id: git-conflict-markers
+      - id: lint-github-workflow
+      - id: lint-github-workflow-header
+      - id: lint-markdown
+        args:
+          - "-c"
+          - ".markdownlint.yml"
+      - id: lint-shell
+        args:
+          - "--color=always"
+          - "--source-path=SCRIPTDIR"
+          - "--exclude=SC2317"
+          - "-x"
+      - id: pre-commit-sort-config
+      - id: security-credentials
+      - id: spelling-commit-message
+      - id: spelling-markdown
+      - id: spelling-vale-sync
+      - id: spelling-vale-vocab
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.2.2
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.22.0
+    hooks:
+      - id: check-jsonschema
+        name: check-github-workflow-push-schema
+        files: "^\\.github/config/workflows/workflow-push.json$"
+        args:
+          - "--schemafile"
+          - ".github/config/schemas/workflows/workflow-push.json"
+        stages: [pre-commit]
+  - repo: local
+    hooks:
+      - id: lint-source
+        name: lint-source
+        entry: npm run lint
+        files: "^src/.*\\.(t|j)sx*$"
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+      - id: prettier
+        name: prettier
+        entry: npm run pre_commit_prettier --
+        language: system
+        files: "^(src)/.+(js|jsx|ts|tsx)$"
+      - id: security-audit
+        name: security-audit
+        entry: npm audit --omit=dev
+        files: "^src/.*\\.(t|j)sx*$"
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
