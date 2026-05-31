@@ -17,28 +17,7 @@ suite("Extension Test Suite", () => {
     let extension: vscode.Extension<any> | undefined;
 
     setup(async () => {
-      // Mock fetch before activation to ensure documentation is "loaded"
-      global.fetch = (async () => ({
-        ok: true,
-        text: async () => `
-          <section id="stdlib-array-assert-is-array">
-            <h3>stdlib.array.assert.is_array<a class="headerlink" href="#stdlib-array-assert-is-array" title="Link to this heading"></a></h3>
-            <p>Asserts that a variable is an array.</p>
-            <section id="arguments">
-              <h4>Arguments<a class="headerlink" href="#arguments" title="Link to this heading"></a></h4>
-              <ul class="simple">
-                <li><p><strong>$1</strong> (string): The name of the variable to check.</p></li>
-              </ul>
-            </section>
-            <section id="exit-codes">
-              <h4>Exit codes<a class="headerlink" href="#exit-codes" title="Link to this heading"></a></h4>
-              <ul class="simple">
-                <li><p><strong>0</strong>: If the assertion succeeded.</p></li>
-              </ul>
-            </section>
-          </section>
-        `,
-      })) as any;
+      mockFetchWithStaticDocumentation();
 
       extension = getExtension();
       await extension?.activate();
@@ -112,3 +91,27 @@ suite("Extension Test Suite", () => {
     });
   });
 });
+
+function mockFetchWithStaticDocumentation() {
+  global.fetch = (async () => ({
+    ok: true,
+    text: async () => `
+      <section id="stdlib-array-assert-is-array">
+        <h3>stdlib.array.assert.is_array<a class="headerlink" href="#stdlib-array-assert-is-array" title="Link to this heading"></a></h3>
+        <p>Asserts that a variable is an array.</p>
+        <section id="arguments">
+          <h4>Arguments<a class="headerlink" href="#arguments" title="Link to this heading"></a></h4>
+          <ul class="simple">
+            <li><p><strong>$1</strong> (string): The name of the variable to check.</p></li>
+          </ul>
+        </section>
+        <section id="exit-codes">
+          <h4>Exit codes<a class="headerlink" href="#exit-codes" title="Link to this heading"></a></h4>
+          <ul class="simple">
+            <li><p><strong>0</strong>: If the assertion succeeded.</p></li>
+          </ul>
+        </section>
+      </section>
+    `,
+  })) as any;
+}
