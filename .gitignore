@@ -1,5 +1,10 @@
-out
-dist
-node_modules
+!.vale/Vocab
+.cicd-tools/boxes
+.cicd-tools/manifest.json
+.vale/*
 .vscode-test/
 *.vsix
+dist
+node_modules
+out
+poetry.lock
