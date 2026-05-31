@@ -17,6 +17,29 @@ suite("Extension Test Suite", () => {
     let extension: vscode.Extension<any> | undefined;
 
     setup(async () => {
+      // Mock fetch before activation to ensure documentation is "loaded"
+      global.fetch = (async () => ({
+        ok: true,
+        text: async () => `
+          <section id="stdlib-array-assert-is-array">
+            <h3>stdlib.array.assert.is_array<a class="headerlink" href="#stdlib-array-assert-is-array" title="Link to this heading"></a></h3>
+            <p>Asserts that a variable is an array.</p>
+            <section id="arguments">
+              <h4>Arguments<a class="headerlink" href="#arguments" title="Link to this heading"></a></h4>
+              <ul class="simple">
+                <li><p><strong>$1</strong> (string): The name of the variable to check.</p></li>
+              </ul>
+            </section>
+            <section id="exit-codes">
+              <h4>Exit codes<a class="headerlink" href="#exit-codes" title="Link to this heading"></a></h4>
+              <ul class="simple">
+                <li><p><strong>0</strong>: If the assertion succeeded.</p></li>
+              </ul>
+            </section>
+          </section>
+        `,
+      })) as any;
+
       extension = getExtension();
       await extension?.activate();
     });
@@ -56,6 +79,35 @@ suite("Extension Test Suite", () => {
       test("it should have completion items with documentation", () => {
           const itemsWithDoc = completions?.items.filter(item => item.documentation);
           assert.ok(itemsWithDoc && itemsWithDoc.length > 0, "Should have items with documentation");
+      });
+    });
+
+    suite("when hover is requested for shellscript", () => {
+      let hovers: vscode.Hover[] | undefined;
+
+      setup(async () => {
+        const document = await vscode.workspace.openTextDocument({
+          language: "shellscript",
+          content: "stdlib.array.assert.is_array",
+        });
+        const position = new vscode.Position(0, 7);
+
+        hovers = await vscode.commands.executeCommand<vscode.Hover[]>(
+          "vscode.executeHoverProvider",
+          document.uri,
+          position
+        );
+      });
+
+      test("it should return a hover", () => {
+        assert.ok(hovers && hovers.length > 0, "Hover should be returned");
+      });
+
+      test("it should contain documentation", () => {
+        const hover = hovers![0];
+        assert.ok(hover.contents.length > 0, "Hover should have contents");
+        const markdown = hover.contents[0] as vscode.MarkdownString;
+        assert.ok(markdown.value.includes("**Description:**"), "Hover should contain Description");
       });
     });
   });

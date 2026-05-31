@@ -14,8 +14,8 @@ export async function activate(context: vscode.ExtensionContext) {
     const urls = fetcher.getUrls(language);
 
     const [normalHtml, testingHtml] = await Promise.all([
-      fetcher.fetch(urls.normal),
-      fetcher.fetch(urls.testing),
+      fetcher.fetch(urls.normal).catch(() => ""),
+      fetcher.fetch(urls.testing).catch(() => ""),
     ]);
 
     const parser = new HtmlDocumentationParser();
@@ -24,7 +24,7 @@ export async function activate(context: vscode.ExtensionContext) {
     console.error("Failed to load or parse documentation:", error);
   }
 
-  const provider = vscode.languages.registerCompletionItemProvider(
+  const completionProvider = vscode.languages.registerCompletionItemProvider(
     "shellscript",
     {
       provideCompletionItems(document, position) {
@@ -40,44 +40,7 @@ export async function activate(context: vscode.ExtensionContext) {
             `${parsedFunction.name} ${argSignature}`.trim();
 
           // 2. Build Markdown Documentation Tooltip
-          const markdown = new vscode.MarkdownString();
-
-          // Description
-          markdown.appendMarkdown(
-            `**Description:**\n${parsedFunction.description}\n\n`,
-          );
-
-          // Arguments (if any)
-          if (parsedFunction.args && parsedFunction.args.length > 0) {
-            markdown.appendMarkdown(`**Arguments:**\n`);
-            parsedFunction.args.forEach((arg) => {
-              markdown.appendMarkdown(
-                `* \`${arg.name}\` _(${arg.type})_ - ${arg.desc}\n`,
-              );
-            });
-            markdown.appendMarkdown(`\n`);
-          }
-
-          // Options (if any)
-          if (parsedFunction.options && parsedFunction.options.length > 0) {
-            markdown.appendMarkdown(`**Options:**\n`);
-            parsedFunction.options.forEach((opt) => {
-              markdown.appendMarkdown(`* \`${opt.flags}\` - ${opt.desc}\n`);
-            });
-            markdown.appendMarkdown(`\n`);
-          }
-
-          // Exit Codes (Now dynamically reading from your parsed output!)
-          if (parsedFunction.exitcodes && parsedFunction.exitcodes.length > 0) {
-            markdown.appendMarkdown(`**Exit Codes:**\n`);
-            parsedFunction.exitcodes.forEach((ec) => {
-              markdown.appendMarkdown(`* \`${ec.code}\` - ${ec.desc}\n`);
-            });
-          }
-
-          console.log(markdown);
-
-          completionItem.documentation = markdown;
+          completionItem.documentation = createMarkdownDocumentation(parsedFunction);
 
           // 3. Smart Code Snippet insertion
           if (parsedFunction.args && parsedFunction.args.length > 0) {
@@ -93,15 +56,72 @@ export async function activate(context: vscode.ExtensionContext) {
             completionItem.insertText = parsedFunction.name;
           }
 
-          console.log(completionItem.documentation);
-
           return completionItem;
         });
       },
     },
   );
 
-  context.subscriptions.push(provider);
+  const hoverProvider = vscode.languages.registerHoverProvider(
+    "shellscript",
+    {
+      provideHover(document, position) {
+        const range = document.getWordRangeAtPosition(position, /[\w.]+/);
+        if (!range) {
+          return null;
+        }
+        const word = document.getText(range);
+
+        const foundFunction = functions.find((f) => f.name === word);
+        if (foundFunction) {
+          return new vscode.Hover(createMarkdownDocumentation(foundFunction));
+        }
+
+        return null;
+      },
+    }
+  );
+
+  context.subscriptions.push(completionProvider, hoverProvider);
+}
+
+function createMarkdownDocumentation(parsedFunction: ShdocFunction): vscode.MarkdownString {
+  const markdown = new vscode.MarkdownString();
+
+  // Description
+  markdown.appendMarkdown(
+    `**Description:**\n${parsedFunction.description}\n\n`,
+  );
+
+  // Arguments (if any)
+  if (parsedFunction.args && parsedFunction.args.length > 0) {
+    markdown.appendMarkdown(`**Arguments:**\n`);
+    parsedFunction.args.forEach((arg) => {
+      markdown.appendMarkdown(
+        `* \`${arg.name}\` _(${arg.type})_ - ${arg.desc}\n`,
+      );
+    });
+    markdown.appendMarkdown(`\n`);
+  }
+
+  // Options (if any)
+  if (parsedFunction.options && parsedFunction.options.length > 0) {
+    markdown.appendMarkdown(`**Options:**\n`);
+    parsedFunction.options.forEach((opt) => {
+      markdown.appendMarkdown(`* \`${opt.flags}\` - ${opt.desc}\n`);
+    });
+    markdown.appendMarkdown(`\n`);
+  }
+
+  // Exit Codes
+  if (parsedFunction.exitcodes && parsedFunction.exitcodes.length > 0) {
+    markdown.appendMarkdown(`**Exit Codes:**\n`);
+    parsedFunction.exitcodes.forEach((ec) => {
+      markdown.appendMarkdown(`* \`${ec.code}\` - ${ec.desc}\n`);
+    });
+  }
+
+  return markdown;
 }
 
 export function deactivate() {}
