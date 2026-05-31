@@ -11,10 +11,42 @@ export async function activate(context: vscode.ExtensionContext) {
   const completionProvider = vscode.languages.registerCompletionItemProvider(
     "shellscript",
     {
-      provideCompletionItems() {
-        return functions.map(createCompletionItem);
+      provideCompletionItems(document, position) {
+        const wordRange = document.getWordRangeAtPosition(position, /[\w.]+/);
+        if (!wordRange) {
+          return [];
+        }
+
+        const fullWordBeforeCursor = document.getText(new vscode.Range(wordRange.start, position));
+        const lastDotIndex = fullWordBeforeCursor.lastIndexOf(".");
+        const prefix = lastDotIndex !== -1 ? fullWordBeforeCursor.substring(0, lastDotIndex + 1) : "";
+
+        const items: vscode.CompletionItem[] = [];
+        const nextSegments = new Set<string>();
+
+        functions.forEach((f) => {
+          if (f.name.startsWith(prefix)) {
+            const remainder = f.name.substring(prefix.length);
+            const segments = remainder.split(".");
+            const nextSegment = segments[0];
+
+            if (segments.length > 1) {
+              if (!nextSegments.has(nextSegment)) {
+                nextSegments.add(nextSegment);
+                const item = new vscode.CompletionItem(nextSegment, vscode.CompletionItemKind.Module);
+                item.command = { command: "editor.action.triggerSuggest", title: "Re-trigger completions..." };
+                items.push(item);
+              }
+            } else {
+              items.push(createCompletionItem(f, nextSegment));
+            }
+          }
+        });
+
+        return items;
       },
     },
+    "."
   );
 
   const hoverProvider = vscode.languages.registerHoverProvider(
