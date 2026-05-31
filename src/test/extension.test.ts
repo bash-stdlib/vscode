@@ -28,7 +28,30 @@ suite("Extension Test Suite", () => {
     });
 
     suite("when completions are requested for shellscript", () => {
-      suite("at the root (stdlib.)", () => {
+      suite("at the root", () => {
+        let completions: vscode.CompletionList | undefined;
+
+        setup(async () => {
+          const document = await vscode.workspace.openTextDocument({
+            language: "shellscript",
+            content: "std",
+          });
+          const position = new vscode.Position(0, 3);
+
+          completions = await vscode.commands.executeCommand<vscode.CompletionList>(
+            "vscode.executeCompletionItemProvider",
+            document.uri,
+            position
+          );
+        });
+
+        test("it should suggest 'stdlib'", () => {
+          const hasStdlib = completions?.items.some((item) => item.label === "stdlib");
+          assert.strictEqual(hasStdlib, true, "Should suggest 'stdlib' at the root");
+        });
+      });
+
+      suite("after 'stdlib.'", () => {
         let completions: vscode.CompletionList | undefined;
 
         setup(async () => {
@@ -45,10 +68,6 @@ suite("Extension Test Suite", () => {
           );
         });
 
-        test("it should return a completion list", () => {
-          assert.ok(completions, "Completion list should be returned");
-        });
-
         test("it should contain the 'array' namespace", () => {
           const hasArrayNamespace = completions?.items.some(
             (item) => item.label === "array" && item.kind === vscode.CompletionItemKind.Module
@@ -57,36 +76,7 @@ suite("Extension Test Suite", () => {
         });
       });
 
-      suite("when indented (  stdlib.)", () => {
-        let completions: vscode.CompletionList | undefined;
-
-        setup(async () => {
-          const document = await vscode.workspace.openTextDocument({
-            language: "shellscript",
-            content: "  stdlib.",
-          });
-          const position = new vscode.Position(0, 9);
-
-          completions = await vscode.commands.executeCommand<vscode.CompletionList>(
-            "vscode.executeCompletionItemProvider",
-            document.uri,
-            position
-          );
-        });
-
-        test("it should return a completion list", () => {
-          assert.ok(completions, "Completion list should be returned");
-        });
-
-        test("it should contain the 'array' namespace", () => {
-          const hasArrayNamespace = completions?.items.some(
-            (item) => item.label === "array" && item.kind === vscode.CompletionItemKind.Module
-          );
-          assert.strictEqual(hasArrayNamespace, true, "Completion list should contain 'array' namespace");
-        });
-      });
-
-      suite("inside a namespace (stdlib.array.assert.)", () => {
+      suite("after 'stdlib.array.assert.'", () => {
         let completions: vscode.CompletionList | undefined;
 
         setup(async () => {

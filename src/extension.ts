@@ -13,13 +13,17 @@ export async function activate(context: vscode.ExtensionContext) {
     {
       provideCompletionItems(document, position) {
         const wordRange = document.getWordRangeAtPosition(position, /[\w.]+/);
-        if (!wordRange) {
-          return [];
-        }
 
-        const fullWordBeforeCursor = document.getText(new vscode.Range(wordRange.start, position));
+        const fullWordBeforeCursor = wordRange
+            ? document.getText(new vscode.Range(wordRange.start, position))
+            : "";
+
         const lastDotIndex = fullWordBeforeCursor.lastIndexOf(".");
         const prefix = lastDotIndex !== -1 ? fullWordBeforeCursor.substring(0, lastDotIndex + 1) : "";
+
+        const range = wordRange
+            ? new vscode.Range(wordRange.start.translate(0, prefix.length), wordRange.end)
+            : new vscode.Range(position, position);
 
         const items: vscode.CompletionItem[] = [];
         const nextSegments = new Set<string>();
@@ -34,14 +38,24 @@ export async function activate(context: vscode.ExtensionContext) {
               if (!nextSegments.has(nextSegment)) {
                 nextSegments.add(nextSegment);
                 const item = new vscode.CompletionItem(nextSegment, vscode.CompletionItemKind.Module);
+                item.range = range;
                 item.command = { command: "editor.action.triggerSuggest", title: "Re-trigger completions..." };
                 items.push(item);
               }
             } else {
-              items.push(createCompletionItem(f, nextSegment));
+              const item = createCompletionItem(f, nextSegment);
+              item.range = range;
+              items.push(item);
             }
           }
         });
+
+        // Handle root level suggestion if nothing is typed yet
+        if (prefix === "" && !fullWordBeforeCursor.includes("stdlib")) {
+            const stdlibItem = new vscode.CompletionItem("stdlib", vscode.CompletionItemKind.Module);
+            stdlibItem.command = { command: "editor.action.triggerSuggest", title: "Re-trigger completions..." };
+            items.push(stdlibItem);
+        }
 
         return items;
       },
