@@ -25,7 +25,7 @@ suite("Extension Test Suite", () => {
       assert.strictEqual(extension?.isActive, true);
     });
 
-    suite("and completions are requested for shellscript", () => {
+    suite("when completions are requested for shellscript", () => {
       let completions: vscode.CompletionList | undefined;
 
       setup(async () => {
