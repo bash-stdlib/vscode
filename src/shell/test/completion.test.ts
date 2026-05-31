@@ -114,6 +114,103 @@ suite("Completion Logic Test Suite", () => {
         assert.strictEqual(nextLevels["parse"], "stdlib.string.parse");
       });
     });
+
+    suite("when filtering root namespaces", () => {
+      const functions: ShdocFunction[] = [
+        {
+          name: "error",
+          namespace: "_testing",
+          args: [],
+          description: "",
+          exitcodes: [],
+          options: [],
+        },
+        {
+          name: "mock",
+          namespace: "_mock",
+          args: [],
+          description: "",
+          exitcodes: [],
+          options: [],
+        },
+        {
+          name: "fn1",
+          namespace: "stdlib.string",
+          args: [],
+          description: "",
+          exitcodes: [],
+          options: [],
+        },
+      ];
+
+      suite("filtering by '_te' prefix", () => {
+        let filtered: { [key: string]: string };
+
+        setup(() => {
+          filtered = getNextNamespaceLevels(functions, "", "_te");
+        });
+
+        test("it should return one matching namespace", () => {
+          assert.strictEqual(Object.keys(filtered).length, 1);
+        });
+
+        test("it should include _testing", () => {
+          assert.ok("_testing" in filtered);
+        });
+
+        test("it should have correct value", () => {
+          assert.strictEqual(filtered["_testing"], "_testing");
+        });
+      });
+
+      suite("filtering by '_xyz' prefix (no matches)", () => {
+        let filtered: { [key: string]: string };
+
+        setup(() => {
+          filtered = getNextNamespaceLevels(functions, "", "_xyz");
+        });
+
+        test("it should return no matches", () => {
+          assert.strictEqual(Object.keys(filtered).length, 0);
+        });
+      });
+
+      suite("filtering by '_' prefix", () => {
+        let filtered: { [key: string]: string };
+
+        setup(() => {
+          filtered = getNextNamespaceLevels(functions, "", "_");
+        });
+
+        test("it should return two matching namespaces", () => {
+          assert.strictEqual(Object.keys(filtered).length, 2);
+        });
+
+        test("it should include _testing", () => {
+          assert.ok("_testing" in filtered);
+        });
+
+        test("it should include _mock", () => {
+          assert.ok("_mock" in filtered);
+        });
+      });
+
+      suite("filtering by 'std' prefix", () => {
+        let filtered: { [key: string]: string };
+
+        setup(() => {
+          filtered = getNextNamespaceLevels(functions, "", "std");
+        });
+
+        test("it should return one matching namespace", () => {
+          assert.strictEqual(Object.keys(filtered).length, 1);
+        });
+
+        test("it should include stdlib", () => {
+          assert.ok("stdlib" in filtered);
+        });
+      });
+    });
   });
 
   suite("getFunctionsInNamespace", () => {

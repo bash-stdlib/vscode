@@ -20,9 +20,31 @@ export async function activate(context: vscode.ExtensionContext) {
     "shellscript",
     createCompletionProvider(functions),
     ".",
+    "@",
+    // Trigger on letters, numbers, and underscore so completions show while typing
+    ...getAlphanumericTriggers(),
   );
 
   context.subscriptions.push(provider);
+}
+
+function getAlphanumericTriggers(): string[] {
+  const triggers: string[] = [];
+  // Add lowercase letters
+  for (let i = 97; i <= 122; i++) {
+    triggers.push(String.fromCharCode(i));
+  }
+  // Add uppercase letters
+  for (let i = 65; i <= 90; i++) {
+    triggers.push(String.fromCharCode(i));
+  }
+  // Add numbers
+  for (let i = 0; i <= 9; i++) {
+    triggers.push(i.toString());
+  }
+  // Add underscore for bash naming conventions
+  triggers.push("_");
+  return triggers;
 }
 
 async function loadFunctions(): Promise<ShdocFunction[]> {
@@ -68,16 +90,32 @@ function createCompletionProvider(
       const { namespace, endsWithDot } =
         extractNamespacePrefixFromLineText(lineText);
 
+      // Don't complete on bare dot
+      if (namespace === "" && endsWithDot) {
+        return [];
+      }
+
+      // Allow completions for root namespace (no prefix, no dot) or when dot is typed
       if (!namespace && !endsWithDot) {
+        // Check if there are root-level functions or top-level namespaces
+        const rootCompletions = createNamespacedCompletions(functions, "");
+        if (rootCompletions.length > 0) {
+          return rootCompletions;
+        }
         return [];
       }
 
-      if (endsWithDot && !namespace) {
-        return [];
-      }
-
-      if (endsWithDot) {
-        return createNamespacedCompletions(functions, namespace);
+      // If namespace doesn't end with dot and doesn't contain a dot,
+      // it might be a partial root-level namespace (e.g., "_te" for "_testing")
+      if (!endsWithDot && !namespace.includes(".")) {
+        const rootCompletions = createNamespacedCompletions(
+          functions,
+          "",
+          namespace,
+        );
+        if (rootCompletions.length > 0) {
+          return rootCompletions;
+        }
       }
 
       return createNamespacedCompletions(functions, namespace);
@@ -88,10 +126,11 @@ function createCompletionProvider(
 function createNamespacedCompletions(
   functions: ShdocFunction[],
   namespace: string,
+  filter?: string,
 ): vscode.CompletionItem[] {
   const completions: vscode.CompletionItem[] = [];
 
-  const nextLevels = getNextNamespaceLevels(functions, namespace);
+  const nextLevels = getNextNamespaceLevels(functions, namespace, filter);
   Object.entries(nextLevels).forEach(([level, fullyQualifiedName]) => {
     completions.push(createNamespaceCompletionItem(level, fullyQualifiedName));
   });
@@ -100,7 +139,9 @@ function createNamespacedCompletions(
     completions.push(createFunctionCompletionItem(fn));
   });
 
-  debug(`Returning ${completions.length} completions for namespace: "${namespace}"`);
+  debug(
+    `Returning ${completions.length} completions for namespace: "${namespace}"`,
+  );
   return completions;
 }
 

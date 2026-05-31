@@ -160,6 +160,107 @@ suite("Extension Test Suite", () => {
           "Namespace items should not end with dot in insertText",
         );
       });
+
+      suite("when typing partial root namespaces", () => {
+        suite("typing '_te' prefix", () => {
+          let completions: vscode.CompletionList | undefined;
+
+          setup(async () => {
+            const document = await vscode.workspace.openTextDocument({
+              language: "shellscript",
+              content: "_te",
+            });
+            const position = new vscode.Position(0, 3);
+
+            completions = await vscode.commands.executeCommand<vscode.CompletionList>(
+              "vscode.executeCompletionItemProvider",
+              document.uri,
+              position,
+            );
+          });
+
+          test("it should return _testing namespace", () => {
+            const testingItem = completions?.items.find(
+              (item) => item.label === "_testing",
+            );
+            assert.ok(testingItem, "Should have _testing namespace completion");
+          });
+
+          test("it should be a module kind", () => {
+            const testingItem = completions?.items.find(
+              (item) => item.label === "_testing",
+            );
+            assert.strictEqual(
+              testingItem?.kind,
+              vscode.CompletionItemKind.Module,
+            );
+          });
+        });
+
+        suite("typing '_m' prefix", () => {
+          let completions: vscode.CompletionList | undefined;
+
+          setup(async () => {
+            const document = await vscode.workspace.openTextDocument({
+              language: "shellscript",
+              content: "_m",
+            });
+            const position = new vscode.Position(0, 2);
+
+            completions = await vscode.commands.executeCommand<vscode.CompletionList>(
+              "vscode.executeCompletionItemProvider",
+              document.uri,
+              position,
+            );
+          });
+
+          test("it should return _mock namespace", () => {
+            const mockItem = completions?.items.find(
+              (item) => item.label === "_mock",
+            );
+            assert.ok(mockItem, "Should have _mock namespace completion");
+          });
+
+          test("it should be a module kind", () => {
+            const mockItem = completions?.items.find(
+              (item) => item.label === "_mock",
+            );
+            assert.strictEqual(mockItem?.kind, vscode.CompletionItemKind.Module);
+          });
+        });
+
+        suite("typing 'std' prefix", () => {
+          let completions: vscode.CompletionList | undefined;
+
+          setup(async () => {
+            const document = await vscode.workspace.openTextDocument({
+              language: "shellscript",
+              content: "std",
+            });
+            const position = new vscode.Position(0, 3);
+
+            completions = await vscode.commands.executeCommand<vscode.CompletionList>(
+              "vscode.executeCompletionItemProvider",
+              document.uri,
+              position,
+            );
+          });
+
+          test("it should return stdlib namespace", () => {
+            const stdlibItem = completions?.items.find(
+              (item) => item.label === "stdlib",
+            );
+            assert.ok(stdlibItem, "Should have stdlib namespace completion");
+          });
+
+          test("it should be a module kind", () => {
+            const stdlibItem = completions?.items.find(
+              (item) => item.label === "stdlib",
+            );
+            assert.strictEqual(stdlibItem?.kind, vscode.CompletionItemKind.Module);
+          });
+        });
+      });
     });
   });
 });

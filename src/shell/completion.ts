@@ -21,6 +21,7 @@ export function extractNamespacePrefixFromLineText(lineText: string): {
 export function getNextNamespaceLevels(
   functions: ShdocFunction[],
   currentNamespace: string,
+  filter?: string,
 ): { [key: string]: string } {
   const prefix = currentNamespace ? currentNamespace + "." : "";
   const levels: { [key: string]: string } = {};
@@ -39,6 +40,20 @@ export function getNextNamespaceLevels(
       }
     }
   });
+
+  // Filter levels by prefix if provided
+  if (filter) {
+    const filtered: { [key: string]: string } = {};
+    Object.entries(levels).forEach(([key, value]) => {
+      if (key.startsWith(filter)) {
+        filtered[key] = value;
+      }
+    });
+    debug(
+      `Next levels (filtered by "${filter}"): ${JSON.stringify(filtered, null, 2)}`,
+    );
+    return filtered;
+  }
 
   debug(`Next levels: ${JSON.stringify(levels, null, 2)}`);
   return levels;

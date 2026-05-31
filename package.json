@@ -30,7 +30,7 @@
         },
         "bash-stdlib.debug": {
           "type": "boolean",
-          "default": false,
+          "default": true,
           "description": "Enable debug logging for completion provider activity in the debug console."
         }
       }
