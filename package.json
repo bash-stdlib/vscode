@@ -27,6 +27,11 @@
             "English documentation"
           ],
           "description": "The language code for the documentation."
+        },
+        "bash-stdlib.debug": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable debug logging for completion provider activity in the debug console."
         }
       }
     },

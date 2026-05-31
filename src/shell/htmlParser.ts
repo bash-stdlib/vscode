@@ -47,7 +47,10 @@ export class HtmlDocumentationParser {
     return h3NameMatch[1].trim().replace(this.permalinkSymbol, "").trim();
   }
 
-  protected parseNamespace(fullFunctionName: string): { namespace: string; functionName: string } {
+  protected parseNamespace(fullFunctionName: string): {
+    namespace: string;
+    functionName: string;
+  } {
     const parts = fullFunctionName.split(".");
     if (parts.length <= 1) {
       return { namespace: "", functionName: fullFunctionName };

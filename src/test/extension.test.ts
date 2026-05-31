@@ -5,7 +5,9 @@ suite("Extension Test Suite", () => {
   vscode.window.showInformationMessage("Start all tests.");
 
   const getExtension = () => {
-    return vscode.extensions.all.find((e) => e.packageJSON.name === "bash-stdlib");
+    return vscode.extensions.all.find(
+      (e) => e.packageJSON.name === "bash-stdlib",
+    );
   };
 
   test("Extension should be present", () => {
@@ -26,36 +28,137 @@ suite("Extension Test Suite", () => {
     });
 
     suite("when completions are requested for shellscript", () => {
-      let completions: vscode.CompletionList | undefined;
-
-      setup(async () => {
+      test("typing 'stdlib.' should return namespace suggestions", async () => {
         const document = await vscode.workspace.openTextDocument({
           language: "shellscript",
           content: "stdlib.",
         });
         const position = new vscode.Position(0, 7);
 
-        completions = await vscode.commands.executeCommand<vscode.CompletionList>(
-          "vscode.executeCompletionItemProvider",
-          document.uri,
-          position
+        const completions =
+          await vscode.commands.executeCommand<vscode.CompletionList>(
+            "vscode.executeCompletionItemProvider",
+            document.uri,
+            position,
+          );
+
+        assert.ok(completions, "Completion list should be returned");
+        const namespaceItems = completions?.items.filter(
+          (item) => item.kind === vscode.CompletionItemKind.Module,
+        );
+        assert.ok(
+          namespaceItems && namespaceItems.length > 0,
+          "Should have namespace suggestions after stdlib.",
         );
       });
 
-      test("it should return a completion list", () => {
-        assert.ok(completions, "Completion list should be returned");
-      });
+      test("typing just '.' should not return namespace or function suggestions", async () => {
+        const document = await vscode.workspace.openTextDocument({
+          language: "shellscript",
+          content: ".",
+        });
+        const position = new vscode.Position(0, 1);
 
-      test("it should contain function items", () => {
-        const hasFunctions = completions?.items.some(
+        const completions =
+          await vscode.commands.executeCommand<vscode.CompletionList>(
+            "vscode.executeCompletionItemProvider",
+            document.uri,
+            position,
+          );
+
+        const namespaceItems = completions?.items.filter(
+          (item) => item.kind === vscode.CompletionItemKind.Module
+        );
+        const functionItems = completions?.items.filter(
           (item) => item.kind === vscode.CompletionItemKind.Function
         );
-        assert.strictEqual(hasFunctions, true, "Completion list should contain function items");
+
+        assert.strictEqual(
+          (namespaceItems?.length || 0) + (functionItems?.length || 0),
+          0,
+          "Bare dot should not return namespace or function completions",
+        );
       });
 
-      test("it should have completion items with documentation", () => {
-          const itemsWithDoc = completions?.items.filter(item => item.documentation);
-          assert.ok(itemsWithDoc && itemsWithDoc.length > 0, "Should have items with documentation");
+      test("typing 'stdlib.array.assert.' should return function completions", async () => {
+        const document = await vscode.workspace.openTextDocument({
+          language: "shellscript",
+          content: "stdlib.array.assert.",
+        });
+        const position = new vscode.Position(0, 19);
+
+        const completions =
+          await vscode.commands.executeCommand<vscode.CompletionList>(
+            "vscode.executeCompletionItemProvider",
+            document.uri,
+            position,
+          );
+
+        assert.ok(completions, "Completion list should be returned");
+        const functionItems = completions?.items.filter(
+          (item) => item.kind === vscode.CompletionItemKind.Function,
+        );
+        assert.ok(
+          functionItems && functionItems.length > 0,
+          "Should have function suggestions in stdlib.array.assert namespace",
+        );
+      });
+
+      test("completion items should have documentation", async () => {
+        const document = await vscode.workspace.openTextDocument({
+          language: "shellscript",
+          content: "stdlib.array.assert.",
+        });
+        const position = new vscode.Position(0, 19);
+
+        const completions =
+          await vscode.commands.executeCommand<vscode.CompletionList>(
+            "vscode.executeCompletionItemProvider",
+            document.uri,
+            position,
+          );
+
+        const functionItems = completions?.items.filter(
+          (item) => item.kind === vscode.CompletionItemKind.Function,
+        );
+        assert.ok(
+          functionItems && functionItems.length > 0,
+          "Should have function items",
+        );
+
+        const itemsWithDoc = functionItems?.filter(
+          (item) => item.documentation,
+        );
+        assert.ok(
+          itemsWithDoc && itemsWithDoc.length > 0,
+          "Function completions should have documentation",
+        );
+      });
+
+      test("namespace completion items should not include dot", async () => {
+        const document = await vscode.workspace.openTextDocument({
+          language: "shellscript",
+          content: "stdlib.",
+        });
+        const position = new vscode.Position(0, 7);
+
+        const completions =
+          await vscode.commands.executeCommand<vscode.CompletionList>(
+            "vscode.executeCompletionItemProvider",
+            document.uri,
+            position,
+          );
+
+        const namespaceItems = completions?.items.filter(
+          (item) => item.kind === vscode.CompletionItemKind.Module,
+        );
+        assert.ok(
+          namespaceItems &&
+            namespaceItems.every(
+              (item) => !item.insertText?.toString().endsWith("."),
+            ),
+          "Namespace items should not end with dot in insertText",
+        );
       });
     });
   });

@@ -2,10 +2,30 @@ import * as vscode from "vscode";
 import { ShdocFunction } from "@/shell/shdoc";
 import { DocumentationFetcher } from "@/shell/fetcher";
 import { HtmlDocumentationParser } from "@/shell/htmlParser";
+import { debug } from "@/debug";
+import {
+  extractNamespacePrefixFromLineText,
+  getNextNamespaceLevels,
+  getFunctionsInNamespace,
+} from "@/shell/completion";
+import {
+  createNamespaceCompletionItem,
+  createFunctionCompletionItem,
+} from "@/shell/completionItem";
 
 export async function activate(context: vscode.ExtensionContext) {
-  let functions: ShdocFunction[] = [];
+  const functions = await loadFunctions();
 
+  const provider = vscode.languages.registerCompletionItemProvider(
+    "shellscript",
+    createCompletionProvider(functions),
+    ".",
+  );
+
+  context.subscriptions.push(provider);
+}
+
+async function loadFunctions(): Promise<ShdocFunction[]> {
   const config = vscode.workspace.getConfiguration("bash-stdlib");
   const language = config.get<string>("documentationLanguage") || "en";
 
@@ -19,98 +39,71 @@ export async function activate(context: vscode.ExtensionContext) {
     ]);
 
     const parser = new HtmlDocumentationParser();
-    functions = [...parser.parse(normalHtml), ...parser.parse(testingHtml)];
+    const allFunctions = [
+      ...parser.parse(normalHtml),
+      ...parser.parse(testingHtml),
+    ];
+
+    debug(`Loaded ${allFunctions.length} functions`);
+    debug("Sample functions:", allFunctions.slice(0, 3));
+
+    return allFunctions;
   } catch (error) {
     console.error("Failed to load or parse documentation:", error);
+    return [];
   }
+}
 
-  const provider = vscode.languages.registerCompletionItemProvider(
-    "shellscript",
-    {
-      provideCompletionItems(document, position) {
-        return functions.map((parsedFunction) => {
-          // Use namespace.function format for display, but function name for insertion
-          const displayName = parsedFunction.namespace
-            ? `${parsedFunction.namespace}.${parsedFunction.name}`
-            : parsedFunction.name;
+function createCompletionProvider(
+  functions: ShdocFunction[],
+): vscode.CompletionItemProvider {
+  return {
+    provideCompletionItems(document, position) {
+      const lineText = document
+        .lineAt(position.line)
+        .text.substring(0, position.character);
 
-          const completionItem = new vscode.CompletionItem(
-            displayName,
-            vscode.CompletionItemKind.Function,
-          );
+      debug(`Completion requested at: "${lineText}"`);
 
-          // Set sort text to namespace for better grouping
-          if (parsedFunction.namespace) {
-            completionItem.sortText = `${parsedFunction.namespace}_${parsedFunction.name}`;
-          }
+      const { namespace, endsWithDot } =
+        extractNamespacePrefixFromLineText(lineText);
 
-          // 1. Signature Details
-          const argSignature = parsedFunction.args.map((a) => a.name).join(" ");
-          completionItem.detail = `${displayName} ${argSignature}`.trim();
+      if (!namespace && !endsWithDot) {
+        return [];
+      }
 
-          // 2. Build Markdown Documentation Tooltip
-          const markdown = new vscode.MarkdownString();
+      if (endsWithDot && !namespace) {
+        return [];
+      }
 
-          // Description
-          markdown.appendMarkdown(
-            `**Description:**\n${parsedFunction.description}\n\n`,
-          );
+      if (endsWithDot) {
+        return createNamespacedCompletions(functions, namespace);
+      }
 
-          // Arguments (if any)
-          if (parsedFunction.args && parsedFunction.args.length > 0) {
-            markdown.appendMarkdown(`**Arguments:**\n`);
-            parsedFunction.args.forEach((arg) => {
-              markdown.appendMarkdown(
-                `* \`${arg.name}\` _(${arg.type})_ - ${arg.desc}\n`,
-              );
-            });
-            markdown.appendMarkdown(`\n`);
-          }
-
-          // Options (if any)
-          if (parsedFunction.options && parsedFunction.options.length > 0) {
-            markdown.appendMarkdown(`**Options:**\n`);
-            parsedFunction.options.forEach((opt) => {
-              markdown.appendMarkdown(`* \`${opt.flags}\` - ${opt.desc}\n`);
-            });
-            markdown.appendMarkdown(`\n`);
-          }
-
-          // Exit Codes (Now dynamically reading from your parsed output!)
-          if (parsedFunction.exitcodes && parsedFunction.exitcodes.length > 0) {
-            markdown.appendMarkdown(`**Exit Codes:**\n`);
-            parsedFunction.exitcodes.forEach((ec) => {
-              markdown.appendMarkdown(`* \`${ec.code}\` - ${ec.desc}\n`);
-            });
-          }
-
-          console.log(markdown);
-
-          completionItem.documentation = markdown;
-
-          // 3. Smart Code Snippet insertion
-          if (parsedFunction.args && parsedFunction.args.length > 0) {
-            const snippetArgs = parsedFunction.args
-              .map((arg, index) => {
-                return `\${${index + 1}:${arg.name}}`;
-              })
-              .join(" ");
-            completionItem.insertText = new vscode.SnippetString(
-              `${displayName} ${snippetArgs}`,
-            );
-          } else {
-            completionItem.insertText = displayName;
-          }
-
-          console.log(completionItem.documentation);
-
-          return completionItem;
-        });
-      },
+      return getFunctionsInNamespace(functions, namespace).map((fn) =>
+        createFunctionCompletionItem(fn),
+      );
     },
-  );
+  };
+}
 
-  context.subscriptions.push(provider);
+function createNamespacedCompletions(
+  functions: ShdocFunction[],
+  namespace: string,
+): vscode.CompletionItem[] {
+  const completions: vscode.CompletionItem[] = [];
+
+  const nextLevels = getNextNamespaceLevels(functions, namespace);
+  nextLevels.forEach((level) => {
+    completions.push(createNamespaceCompletionItem(level));
+  });
+
+  getFunctionsInNamespace(functions, namespace).forEach((fn) => {
+    completions.push(createFunctionCompletionItem(fn));
+  });
+
+  debug(`Returning ${completions.length} completions`);
+  return completions;
 }
 
 export function deactivate() {}
