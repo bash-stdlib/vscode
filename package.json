@@ -47,6 +47,7 @@
     "compile": "tsc -p ./ && tsc-alias && mkdir -p out/shell/test/assets && cp src/shell/test/assets/*.html out/shell/test/assets/",
     "watch": "concurrently --prefix none \"tsc-alias -w\" \"tsc -w\" ",
     "pretest": "npm run compile && npm run lint",
+    "pre_commit_prettier": "npx prettier --write",
     "lint": "eslint src",
     "test": "vscode-test"
   },
@@ -59,6 +60,7 @@
     "@vscode/test-electron": "^2.5.2",
     "concurrently": "^10.0.0",
     "eslint": "^9.39.3",
+    "prettier": "^3.8.3",
     "tsc-alias": "^1.8.17",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
