@@ -13,6 +13,7 @@ import {
   createFunctionCompletionItem,
 } from "@/shell/completionItem";
 import { createHoverProvider } from "@/shell/hoverProvider";
+import { getFunctionsForContext } from "@/shell/context";
 
 export async function activate(context: vscode.ExtensionContext) {
   const functions = await loadFunctions();
@@ -86,18 +87,16 @@ function createCompletionProvider(
 ): vscode.CompletionItemProvider {
   return {
     provideCompletionItems(document, position) {
-      const isTestFile = document.fileName.toLowerCase().includes("test");
-      const functionsAvailableInContext = isTestFile
-        ? allFunctions
-        : allFunctions.filter((fn) => !fn.isTesting);
+      const functionsAvailableInContext = getFunctionsForContext(
+        allFunctions,
+        document,
+      );
 
       const lineText = document
         .lineAt(position.line)
         .text.substring(0, position.character);
 
-      debug(
-        `Completion requested at: "${lineText}" in ${isTestFile ? "test" : "normal"} file`,
-      );
+      debug(`Completion requested at: "${lineText}"`);
 
       const { namespace, endsWithDot } =
         extractNamespacePrefixFromLineText(lineText);
