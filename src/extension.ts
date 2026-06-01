@@ -68,8 +68,8 @@ async function loadFunctions(): Promise<ShdocFunction[]> {
 
     const parser = new HtmlDocumentationParser();
     const allFunctions = [
-      ...parser.parse(normalHtml, false),
-      ...parser.parse(testingHtml, true),
+      ...parser.parse(normalHtml, { isTesting: false }),
+      ...parser.parse(testingHtml, { isTesting: true }),
     ];
 
     debug(`Loaded ${allFunctions.length} functions`);

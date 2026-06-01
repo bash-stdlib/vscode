@@ -3,31 +3,63 @@ import * as vscode from "vscode";
 import { isTestContext } from "@/shell/context";
 
 suite("isTestContext Logic Test Suite", () => {
-  test("it should return true if filename contains 'test'", () => {
-    const mockDoc = {
-      uri: vscode.Uri.file("/path/to/my_test.sh"),
-    } as vscode.TextDocument;
-    assert.strictEqual(isTestContext(mockDoc), true);
+  suite("when path contains 'test' in the filename", () => {
+    let result: boolean;
+
+    setup(() => {
+      const mockDoc = {
+        uri: vscode.Uri.file("/path/to/my_test.sh"),
+      } as vscode.TextDocument;
+      result = isTestContext(mockDoc);
+    });
+
+    test("it should return true", () => {
+      assert.strictEqual(result, true);
+    });
   });
 
-  test("it should return true if path contains 'tests' folder", () => {
-    const mockDoc = {
-      uri: vscode.Uri.file("/path/to/tests/helper.sh"),
-    } as vscode.TextDocument;
-    assert.strictEqual(isTestContext(mockDoc), true);
+  suite("when path contains 'tests' folder", () => {
+    let result: boolean;
+
+    setup(() => {
+      const mockDoc = {
+        uri: vscode.Uri.file("/path/to/tests/helper.sh"),
+      } as vscode.TextDocument;
+      result = isTestContext(mockDoc);
+    });
+
+    test("it should return true", () => {
+      assert.strictEqual(result, true);
+    });
   });
 
-  test("it should return false if path does not contain 'test'", () => {
-    const mockDoc = {
-      uri: vscode.Uri.file("/path/to/script.sh"),
-    } as vscode.TextDocument;
-    assert.strictEqual(isTestContext(mockDoc), false);
+  suite("when path does not contain 'test'", () => {
+    let result: boolean;
+
+    setup(() => {
+      const mockDoc = {
+        uri: vscode.Uri.file("/path/to/script.sh"),
+      } as vscode.TextDocument;
+      result = isTestContext(mockDoc);
+    });
+
+    test("it should return false", () => {
+      assert.strictEqual(result, false);
+    });
   });
 
-  test("it should be case-insensitive", () => {
-    const mockDoc = {
-      uri: vscode.Uri.file("/path/to/TEST_SCRIPT.sh"),
-    } as vscode.TextDocument;
-    assert.strictEqual(isTestContext(mockDoc), true);
+  suite("when path contains uppercase 'TEST'", () => {
+    let result: boolean;
+
+    setup(() => {
+      const mockDoc = {
+        uri: vscode.Uri.file("/path/to/TEST_SCRIPT.sh"),
+      } as vscode.TextDocument;
+      result = isTestContext(mockDoc);
+    });
+
+    test("it should return true", () => {
+      assert.strictEqual(result, true);
+    });
   });
 });

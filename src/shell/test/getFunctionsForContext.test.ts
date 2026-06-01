@@ -23,20 +23,37 @@ suite("getFunctionsForContext Logic Test Suite", () => {
     },
   ];
 
-  test("it should return all functions in test context", () => {
-    const mockDoc = {
-      uri: vscode.Uri.file("/path/to/test.sh"),
-    } as vscode.TextDocument;
-    const result = getFunctionsForContext(mockFunctions, mockDoc);
-    assert.strictEqual(result.length, 2);
+  suite("when in a test context", () => {
+    let result: ShdocFunction[];
+
+    setup(() => {
+      const mockDoc = {
+        uri: vscode.Uri.file("/path/to/test.sh"),
+      } as vscode.TextDocument;
+      result = getFunctionsForContext(mockFunctions, mockDoc);
+    });
+
+    test("it should return all functions", () => {
+      assert.strictEqual(result.length, 2);
+    });
   });
 
-  test("it should return only normal functions in non-test context", () => {
-    const mockDoc = {
-      uri: vscode.Uri.file("/path/to/normal.sh"),
-    } as vscode.TextDocument;
-    const result = getFunctionsForContext(mockFunctions, mockDoc);
-    assert.strictEqual(result.length, 1);
-    assert.strictEqual(result[0].name, "normal_fn");
+  suite("when not in a test context", () => {
+    let result: ShdocFunction[];
+
+    setup(() => {
+      const mockDoc = {
+        uri: vscode.Uri.file("/path/to/normal.sh"),
+      } as vscode.TextDocument;
+      result = getFunctionsForContext(mockFunctions, mockDoc);
+    });
+
+    test("it should return only normal functions", () => {
+      assert.strictEqual(result.length, 1);
+    });
+
+    test("it should include the normal function", () => {
+      assert.strictEqual(result[0].name, "normal_fn");
+    });
   });
 });

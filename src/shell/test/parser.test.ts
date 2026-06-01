@@ -19,7 +19,7 @@ suite("HTML Parser Test Suite", () => {
     setup(() => {
       const html = loadAsset("single_function.html");
 
-      functions = parser.parse(html);
+      functions = parser.parse(html, { isTesting: false });
       firstFunction = functions[0];
     });
 
@@ -83,7 +83,7 @@ suite("HTML Parser Test Suite", () => {
     setup(() => {
       const html = loadAsset("multiple_functions.html");
 
-      functions = parser.parse(html);
+      functions = parser.parse(html, { isTesting: false });
     });
 
     test("it should extract two functions", () => {
@@ -114,7 +114,7 @@ suite("HTML Parser Test Suite", () => {
     setup(() => {
       const html = loadAsset("auto_id_function.html");
 
-      functions = parser.parse(html);
+      functions = parser.parse(html, { isTesting: false });
       firstFunction = functions[0];
     });
 
@@ -144,7 +144,7 @@ suite("HTML Parser Test Suite", () => {
 
     setup(() => {
       const html = loadAsset("testing_functions.html");
-      functions = parser.parse(html, true);
+      functions = parser.parse(html, { isTesting: true });
     });
 
     test("it should extract three functions", () => {

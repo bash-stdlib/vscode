@@ -19,7 +19,7 @@ suite("Context Aware Completion Integration Test Suite", () => {
       await extension?.activate();
     });
 
-    suite("in a normal file (no 'test' in name)", () => {
+    suite("in a normal file (no 'test' in path)", () => {
       let document: vscode.TextDocument;
 
       setup(async () => {
@@ -29,40 +29,51 @@ suite("Context Aware Completion Integration Test Suite", () => {
         });
       });
 
-      test("typing 'stdlib.' should return namespace suggestions", async () => {
-        const completions = await getCompletionsAt(document, 0, 7);
+      suite("when typing 'stdlib.'", () => {
+        let completions: vscode.CompletionList | undefined;
 
-        assert.ok(completions, "Completion list should be returned");
-        const namespaceItems = completions?.items.filter(
-          (item) => item.kind === vscode.CompletionItemKind.Module,
-        );
-        assert.ok(
-          namespaceItems &&
-            namespaceItems.some((item) => item.label === "array"),
-          "Should have array namespace suggestion under stdlib. in normal file",
-        );
+        setup(async () => {
+          completions = await getCompletionsAt(document, 0, 7);
+        });
+
+        test("it should return namespace suggestions", () => {
+          assert.ok(completions);
+        });
+
+        test("it should have array namespace suggestion", () => {
+          const namespaceItems = completions?.items.filter(
+            (item) => item.kind === vscode.CompletionItemKind.Module,
+          );
+          assert.ok(
+            namespaceItems &&
+              namespaceItems.some((item) => item.label === "array"),
+          );
+        });
       });
 
       suite("when typing partial root namespaces", () => {
-        test("it should NOT return _testing namespace in normal file", async () => {
-          const doc = await vscode.workspace.openTextDocument({
-            language: "shellscript",
-            content: "_te",
-          });
-          const completions = await getCompletionsAt(doc, 0, 3);
+        suite("typing '_te' prefix", () => {
+          let completions: vscode.CompletionList | undefined;
 
-          const testingItem = completions?.items.find(
-            (item) => item.label === "_testing",
-          );
-          assert.ok(
-            !testingItem,
-            "Should NOT have _testing namespace completion in normal file",
-          );
+          setup(async () => {
+            const doc = await vscode.workspace.openTextDocument({
+              language: "shellscript",
+              content: "_te",
+            });
+            completions = await getCompletionsAt(doc, 0, 3);
+          });
+
+          test("it should NOT return _testing namespace", () => {
+            const testingItem = completions?.items.find(
+              (item) => item.label === "_testing",
+            );
+            assert.ok(!testingItem);
+          });
         });
       });
     });
 
-    suite("in a test file ('test' in name)", () => {
+    suite("in a test file ('test' in path)", () => {
       let document: vscode.TextDocument;
 
       setup(async () => {
@@ -71,27 +82,37 @@ suite("Context Aware Completion Integration Test Suite", () => {
         await vscode.languages.setTextDocumentLanguage(document, "shellscript");
       });
 
-      test("typing '_te' should return _testing namespace", async () => {
-        await insertText(document, "_te");
+      suite("when typing '_te'", () => {
+        let completions: vscode.CompletionList | undefined;
 
-        const completions = await getCompletionsAt(document, 0, 3);
+        setup(async () => {
+          await insertText(document, "_te");
+          completions = await getCompletionsAt(document, 0, 3);
+        });
 
-        const testingItem = completions?.items.find(
-          (item) => item.label === "_testing",
-        );
-        assert.ok(testingItem);
+        test("it should return _testing namespace", () => {
+          const testingItem = completions?.items.find(
+            (item) => item.label === "_testing",
+          );
+          assert.ok(testingItem);
+        });
       });
 
-      test("typing 'std' should return stdlib namespace", async () => {
-        await clearDocument(document);
-        await insertText(document, "std");
+      suite("when typing 'std'", () => {
+        let completions: vscode.CompletionList | undefined;
 
-        const completions = await getCompletionsAt(document, 0, 3);
+        setup(async () => {
+          await clearDocument(document);
+          await insertText(document, "std");
+          completions = await getCompletionsAt(document, 0, 3);
+        });
 
-        const stdlibItem = completions?.items.find(
-          (item) => item.label === "stdlib",
-        );
-        assert.ok(stdlibItem);
+        test("it should return stdlib namespace", () => {
+          const stdlibItem = completions?.items.find(
+            (item) => item.label === "stdlib",
+          );
+          assert.ok(stdlibItem);
+        });
       });
     });
   });
