@@ -1,7 +1,7 @@
 import { ShdocFunction, ShdocArg, ShdocExitCode } from "@/shell/shdoc";
 import { MESSAGE_NO_DESCRIPTION } from "@/constants";
 
-export interface ParseOptions {
+export interface HtmlDocumentationParserOptions {
   isTesting: boolean;
 }
 
@@ -9,7 +9,10 @@ export class HtmlDocumentationParser {
   protected readonly permalinkSymbol = "";
   protected readonly noDescriptionMessage = MESSAGE_NO_DESCRIPTION;
 
-  public parse(html: string, options: ParseOptions): ShdocFunction[] {
+  public parse(
+    html: string,
+    options: HtmlDocumentationParserOptions,
+  ): ShdocFunction[] {
     const sections = this.splitIntoSections(html);
 
     return sections
