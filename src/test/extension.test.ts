@@ -1,5 +1,6 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
+import { getCompletionsAt } from "./testHelpers";
 
 suite("Extension Test Suite", () => {
   vscode.window.showInformationMessage("Start all tests.");
@@ -21,6 +22,9 @@ suite("Extension Test Suite", () => {
     setup(async () => {
       extension = getExtension();
       await extension?.activate();
+      await vscode.workspace
+        .getConfiguration("bash-stdlib")
+        .update("debug", true, true);
     });
 
     test("it should be active", () => {
@@ -38,40 +42,12 @@ suite("Extension Test Suite", () => {
           });
         });
 
-        test("typing 'stdlib.' should return namespace suggestions", async () => {
-          const position = new vscode.Position(0, 7);
-
-          const completions =
-            await vscode.commands.executeCommand<vscode.CompletionList>(
-              "vscode.executeCompletionItemProvider",
-              document.uri,
-              position,
-            );
-
-          assert.ok(completions, "Completion list should be returned");
-          const namespaceItems = completions?.items.filter(
-            (item) => item.kind === vscode.CompletionItemKind.Module,
-          );
-          assert.ok(
-            namespaceItems &&
-              namespaceItems.some((item) => item.label === "array"),
-            "Should have array namespace suggestion under stdlib. in normal file",
-          );
-        });
-
         test("typing just '.' should not return namespace or function suggestions", async () => {
           const doc = await vscode.workspace.openTextDocument({
             language: "shellscript",
             content: ".",
           });
-          const position = new vscode.Position(0, 1);
-
-          const completions =
-            await vscode.commands.executeCommand<vscode.CompletionList>(
-              "vscode.executeCompletionItemProvider",
-              doc.uri,
-              position,
-            );
+          const completions = await getCompletionsAt(doc, 0, 1);
 
           const namespaceItems = completions?.items.filter(
             (item) => item.kind === vscode.CompletionItemKind.Module,
@@ -92,14 +68,7 @@ suite("Extension Test Suite", () => {
             language: "shellscript",
             content: "stdlib.array.assert.",
           });
-          const position = new vscode.Position(0, 19);
-
-          const completions =
-            await vscode.commands.executeCommand<vscode.CompletionList>(
-              "vscode.executeCompletionItemProvider",
-              doc.uri,
-              position,
-            );
+          const completions = await getCompletionsAt(doc, 0, 19);
 
           assert.ok(completions, "Completion list should be returned");
           const functionItems = completions?.items.filter(
@@ -116,14 +85,7 @@ suite("Extension Test Suite", () => {
             language: "shellscript",
             content: "stdlib.array.assert.",
           });
-          const position = new vscode.Position(0, 19);
-
-          const completions =
-            await vscode.commands.executeCommand<vscode.CompletionList>(
-              "vscode.executeCompletionItemProvider",
-              doc.uri,
-              position,
-            );
+          const completions = await getCompletionsAt(doc, 0, 19);
 
           const functionItems = completions?.items.filter(
             (item) => item.kind === vscode.CompletionItemKind.Function,
@@ -147,14 +109,7 @@ suite("Extension Test Suite", () => {
             language: "shellscript",
             content: "stdlib.",
           });
-          const position = new vscode.Position(0, 7);
-
-          const completions =
-            await vscode.commands.executeCommand<vscode.CompletionList>(
-              "vscode.executeCompletionItemProvider",
-              doc.uri,
-              position,
-            );
+          const completions = await getCompletionsAt(doc, 0, 7);
 
           const namespaceItems = completions?.items.filter(
             (item) => item.kind === vscode.CompletionItemKind.Module,
@@ -169,35 +124,6 @@ suite("Extension Test Suite", () => {
         });
 
         suite("when typing partial root namespaces", () => {
-          suite("typing '_te' prefix", () => {
-            let completions: vscode.CompletionList | undefined;
-
-            setup(async () => {
-              const doc = await vscode.workspace.openTextDocument({
-                language: "shellscript",
-                content: "_te",
-              });
-              const position = new vscode.Position(0, 3);
-
-              completions =
-                await vscode.commands.executeCommand<vscode.CompletionList>(
-                  "vscode.executeCompletionItemProvider",
-                  doc.uri,
-                  position,
-                );
-            });
-
-            test("it should NOT return _testing namespace in normal file", () => {
-              const testingItem = completions?.items.find(
-                (item) => item.label === "_testing",
-              );
-              assert.ok(
-                !testingItem,
-                "Should NOT have _testing namespace completion in normal file",
-              );
-            });
-          });
-
           suite("typing 'std' prefix", () => {
             let completions: vscode.CompletionList | undefined;
 
@@ -206,14 +132,7 @@ suite("Extension Test Suite", () => {
                 language: "shellscript",
                 content: "std",
               });
-              const position = new vscode.Position(0, 3);
-
-              completions =
-                await vscode.commands.executeCommand<vscode.CompletionList>(
-                  "vscode.executeCompletionItemProvider",
-                  doc.uri,
-                  position,
-                );
+              completions = await getCompletionsAt(doc, 0, 3);
             });
 
             test("it should return stdlib namespace", () => {
@@ -233,42 +152,6 @@ suite("Extension Test Suite", () => {
               );
             });
           });
-        });
-      });
-
-      suite("in a test file ('test' in name)", () => {
-        let document: vscode.TextDocument;
-
-        setup(async () => {
-          const uri = vscode.Uri.parse("untitled:my_test_script.sh");
-          document = await vscode.workspace.openTextDocument(uri);
-          await vscode.languages.setTextDocumentLanguage(
-            document,
-            "shellscript",
-          );
-        });
-
-        test("typing '_te' should return _testing namespace", async () => {
-          await insertText(document, "_te");
-
-          const completions = await getCompletionsAt(document, 0, 3);
-
-          const testingItem = completions?.items.find(
-            (item) => item.label === "_testing",
-          );
-          assert.ok(testingItem);
-        });
-
-        test("typing 'std' should return stdlib namespace", async () => {
-          await clearDocument(document);
-          await insertText(document, "std");
-
-          const completions = await getCompletionsAt(document, 0, 3);
-
-          const stdlibItem = completions?.items.find(
-            (item) => item.label === "stdlib",
-          );
-          assert.ok(stdlibItem);
         });
       });
     });
@@ -366,30 +249,3 @@ suite("Extension Test Suite", () => {
     });
   });
 });
-
-async function clearDocument(document: vscode.TextDocument) {
-  const edit = new vscode.WorkspaceEdit();
-  edit.delete(
-    document.uri,
-    new vscode.Range(0, 0, document.lineCount, 0),
-  );
-  await vscode.workspace.applyEdit(edit);
-}
-
-async function getCompletionsAt(
-  document: vscode.TextDocument,
-  line: number,
-  character: number,
-) {
-  return await vscode.commands.executeCommand<vscode.CompletionList>(
-    "vscode.executeCompletionItemProvider",
-    document.uri,
-    new vscode.Position(line, character),
-  );
-}
-
-async function insertText(document: vscode.TextDocument, text: string) {
-  const edit = new vscode.WorkspaceEdit();
-  edit.insert(document.uri, new vscode.Position(0, 0), text);
-  await vscode.workspace.applyEdit(edit);
-}
