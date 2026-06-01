@@ -39,6 +39,7 @@ suite("Completion Item Test Suite", () => {
           { name: "arr", type: "array", desc: "Array" },
         ],
         exitcodes: [{ code: "0", desc: "Success" }],
+        isTesting: false,
         options: [{ flags: "-v", desc: "Verbose" }],
       };
 
@@ -83,6 +84,7 @@ suite("Completion Item Test Suite", () => {
         description: "A simple function.",
         args: [],
         exitcodes: [],
+        isTesting: false,
         options: [],
       };
 

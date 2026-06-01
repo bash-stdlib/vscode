@@ -22,7 +22,6 @@ export async function activate(context: vscode.ExtensionContext) {
     createCompletionProvider(functions),
     ".",
     "@",
-    // Trigger on letters, numbers, and underscore so completions show while typing
     ...getAlphanumericTriggers(),
   );
 
@@ -68,8 +67,8 @@ async function loadFunctions(): Promise<ShdocFunction[]> {
 
     const parser = new HtmlDocumentationParser();
     const allFunctions = [
-      ...parser.parse(normalHtml),
-      ...parser.parse(testingHtml),
+      ...parser.parse(normalHtml, false),
+      ...parser.parse(testingHtml, true),
     ];
 
     debug(`Loaded ${allFunctions.length} functions`);
@@ -83,15 +82,22 @@ async function loadFunctions(): Promise<ShdocFunction[]> {
 }
 
 function createCompletionProvider(
-  functions: ShdocFunction[],
+  allFunctions: ShdocFunction[],
 ): vscode.CompletionItemProvider {
   return {
     provideCompletionItems(document, position) {
+      const isTestFile = document.fileName.toLowerCase().includes("test");
+      const functionsAvailableInContext = isTestFile
+        ? allFunctions
+        : allFunctions.filter((fn) => !fn.isTesting);
+
       const lineText = document
         .lineAt(position.line)
         .text.substring(0, position.character);
 
-      debug(`Completion requested at: "${lineText}"`);
+      debug(
+        `Completion requested at: "${lineText}" in ${isTestFile ? "test" : "normal"} file`,
+      );
 
       const { namespace, endsWithDot } =
         extractNamespacePrefixFromLineText(lineText);
@@ -101,21 +107,20 @@ function createCompletionProvider(
         return [];
       }
 
-      // Allow completions for root namespace (no prefix, no dot) or when dot is typed
       if (!namespace && !endsWithDot) {
-        // Check if there are root-level functions or top-level namespaces
-        const rootCompletions = createNamespacedCompletions(functions, "");
+        const rootCompletions = createNamespacedCompletions(
+          functionsAvailableInContext,
+          "",
+        );
         if (rootCompletions.length > 0) {
           return rootCompletions;
         }
         return [];
       }
 
-      // If namespace doesn't end with dot and doesn't contain a dot,
-      // it might be a partial root-level namespace (e.g., "_te" for "_testing")
       if (!endsWithDot && !namespace.includes(".")) {
         const rootCompletions = createNamespacedCompletions(
-          functions,
+          functionsAvailableInContext,
           "",
           namespace,
         );
@@ -124,7 +129,7 @@ function createCompletionProvider(
         }
       }
 
-      return createNamespacedCompletions(functions, namespace);
+      return createNamespacedCompletions(functionsAvailableInContext, namespace);
     },
   };
 }

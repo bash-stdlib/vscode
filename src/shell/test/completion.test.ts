@@ -79,6 +79,7 @@ suite("Completion Logic Test Suite", () => {
           args: [],
           description: "",
           exitcodes: [],
+          isTesting: false,
           options: [],
         },
         {
@@ -87,6 +88,7 @@ suite("Completion Logic Test Suite", () => {
           args: [],
           description: "",
           exitcodes: [],
+          isTesting: false,
           options: [],
         },
         {
@@ -95,6 +97,7 @@ suite("Completion Logic Test Suite", () => {
           args: [],
           description: "",
           exitcodes: [],
+          isTesting: false,
           options: [],
         },
       ];
@@ -123,6 +126,7 @@ suite("Completion Logic Test Suite", () => {
           args: [],
           description: "",
           exitcodes: [],
+          isTesting: true,
           options: [],
         },
         {
@@ -131,6 +135,7 @@ suite("Completion Logic Test Suite", () => {
           args: [],
           description: "",
           exitcodes: [],
+          isTesting: true,
           options: [],
         },
         {
@@ -139,6 +144,7 @@ suite("Completion Logic Test Suite", () => {
           args: [],
           description: "",
           exitcodes: [],
+          isTesting: false,
           options: [],
         },
       ];
@@ -223,6 +229,7 @@ suite("Completion Logic Test Suite", () => {
           args: [],
           description: "",
           exitcodes: [],
+          isTesting: false,
           options: [],
         },
         {
@@ -231,6 +238,7 @@ suite("Completion Logic Test Suite", () => {
           args: [],
           description: "",
           exitcodes: [],
+          isTesting: false,
           options: [],
         },
         {
@@ -239,6 +247,7 @@ suite("Completion Logic Test Suite", () => {
           args: [],
           description: "",
           exitcodes: [],
+          isTesting: false,
           options: [],
         },
       ];

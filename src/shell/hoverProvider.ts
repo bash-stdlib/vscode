@@ -3,10 +3,15 @@ import { ShdocFunction } from "./shdoc";
 import { debug } from "@/debug";
 
 export function createHoverProvider(
-  functions: ShdocFunction[],
+  allFunctions: ShdocFunction[],
 ): vscode.HoverProvider {
   return {
     provideHover(document, position) {
+      const isTestFile = document.fileName.toLowerCase().includes("test");
+      const functionsAvailableInContext = isTestFile
+        ? allFunctions
+        : allFunctions.filter((fn) => !fn.isTesting);
+
       const word = document.getWordRangeAtPosition(position);
       if (!word) {
         return null;
@@ -15,16 +20,16 @@ export function createHoverProvider(
       const text = document.getText(word);
       const lineText = document.lineAt(position.line).text;
 
-      // Extract the full identifier chain (e.g., stdlib.array.assert.is_empty)
       const fullIdentifier = extractFullIdentifier(
         lineText,
         position.character,
       );
 
-      debug(`Hover requested for: "${fullIdentifier}"`);
+      debug(
+        `Hover requested for: "${fullIdentifier}" in ${isTestFile ? "test" : "normal"} file`,
+      );
 
-      // Try to find the function
-      const foundFunction = findFunction(functions, fullIdentifier);
+      const foundFunction = findFunction(functionsAvailableInContext, fullIdentifier);
 
       if (!foundFunction) {
         return null;

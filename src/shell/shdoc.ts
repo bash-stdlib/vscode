@@ -18,6 +18,7 @@ export interface ShdocFunction {
   args: ShdocArg[];
   description: string;
   exitcodes: ShdocExitCode[];
+  isTesting: boolean;
   name: string;
   namespace?: string;
   options: ShdocOption[];

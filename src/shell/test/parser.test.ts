@@ -144,7 +144,7 @@ suite("HTML Parser Test Suite", () => {
 
     setup(() => {
       const html = loadAsset("testing_functions.html");
-      functions = parser.parse(html);
+      functions = parser.parse(html, true);
     });
 
     test("it should extract three functions", () => {
@@ -155,6 +155,7 @@ suite("HTML Parser Test Suite", () => {
       const fn = functions.find((f) => f.name === "assert_is_array");
       assert.ok(fn);
       assert.strictEqual(fn.namespace, "");
+      assert.strictEqual(fn.isTesting, true);
     });
 
     test("it should correctly extract _testing.error and assign it to _testing namespace", () => {

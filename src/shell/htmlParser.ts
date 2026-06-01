@@ -5,11 +5,13 @@ export class HtmlDocumentationParser {
   protected readonly permalinkSymbol = "";
   protected readonly noDescriptionMessage = MESSAGE_NO_DESCRIPTION;
 
-  public parse(html: string): ShdocFunction[] {
+  public parse(html: string, isTesting = false): ShdocFunction[] {
     const sections = this.splitIntoSections(html);
 
     return sections
-      .map((sectionContent) => this.parseFunctionSection(sectionContent))
+      .map((sectionContent) =>
+        this.parseFunctionSection(sectionContent, isTesting),
+      )
       .filter(
         (parsedFunction): parsedFunction is ShdocFunction =>
           parsedFunction !== null,
@@ -35,7 +37,10 @@ export class HtmlDocumentationParser {
     return sections;
   }
 
-  protected parseFunctionSection(sectionHtml: string): ShdocFunction | null {
+  protected parseFunctionSection(
+    sectionHtml: string,
+    isTesting: boolean,
+  ): ShdocFunction | null {
     const fullFunctionName = this.extractFunctionName(sectionHtml);
     if (!fullFunctionName) {
       return null;
@@ -48,6 +53,7 @@ export class HtmlDocumentationParser {
       namespace,
       description: this.extractDescription(sectionHtml),
       args: this.extractArguments(sectionHtml),
+      isTesting,
       options: [],
       exitcodes: this.extractExitCodes(sectionHtml),
     };
