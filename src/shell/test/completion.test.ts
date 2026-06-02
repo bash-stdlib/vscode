@@ -79,7 +79,7 @@ suite("Completion Logic Test Suite", () => {
           args: [],
           description: "",
           exitcodes: [],
-          isTesting: false,
+          isTesting: false, globals: [], keywords: [],
           options: [],
         },
         {
@@ -88,7 +88,7 @@ suite("Completion Logic Test Suite", () => {
           args: [],
           description: "",
           exitcodes: [],
-          isTesting: false,
+          isTesting: false, globals: [], keywords: [],
           options: [],
         },
         {
@@ -97,7 +97,7 @@ suite("Completion Logic Test Suite", () => {
           args: [],
           description: "",
           exitcodes: [],
-          isTesting: false,
+          isTesting: false, globals: [], keywords: [],
           options: [],
         },
       ];
@@ -126,7 +126,7 @@ suite("Completion Logic Test Suite", () => {
           args: [],
           description: "",
           exitcodes: [],
-          isTesting: true,
+          isTesting: true, globals: [], keywords: [],
           options: [],
         },
         {
@@ -135,7 +135,7 @@ suite("Completion Logic Test Suite", () => {
           args: [],
           description: "",
           exitcodes: [],
-          isTesting: true,
+          isTesting: true, globals: [], keywords: [],
           options: [],
         },
         {
@@ -144,7 +144,7 @@ suite("Completion Logic Test Suite", () => {
           args: [],
           description: "",
           exitcodes: [],
-          isTesting: false,
+          isTesting: false, globals: [], keywords: [],
           options: [],
         },
       ];
@@ -229,7 +229,7 @@ suite("Completion Logic Test Suite", () => {
           args: [],
           description: "",
           exitcodes: [],
-          isTesting: false,
+          isTesting: false, globals: [], keywords: [],
           options: [],
         },
         {
@@ -238,7 +238,7 @@ suite("Completion Logic Test Suite", () => {
           args: [],
           description: "",
           exitcodes: [],
-          isTesting: false,
+          isTesting: false, globals: [], keywords: [],
           options: [],
         },
         {
@@ -247,7 +247,7 @@ suite("Completion Logic Test Suite", () => {
           args: [],
           description: "",
           exitcodes: [],
-          isTesting: false,
+          isTesting: false, globals: [], keywords: [],
           options: [],
         },
       ];

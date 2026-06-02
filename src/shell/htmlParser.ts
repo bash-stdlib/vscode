@@ -55,12 +55,16 @@ export class HtmlDocumentationParser {
 
     const { namespace, functionName } = this.parseNamespace(fullFunctionName);
 
+    const { keywords, globals } = this.extractKeywordsAndGlobals(sectionHtml);
+
     return {
       name: functionName,
       namespace,
       description: this.extractDescription(sectionHtml),
       args: this.extractArguments(sectionHtml),
+      globals,
       isTesting,
+      keywords,
       options: [],
       exitcodes: this.extractExitCodes(sectionHtml),
     };
@@ -103,6 +107,40 @@ export class HtmlDocumentationParser {
       : this.noDescriptionMessage;
 
     return this.sanitizeText(rawDescription);
+  }
+
+  protected extractKeywordsAndGlobals(sectionHtml: string): {
+    keywords: ShdocArg[];
+    globals: ShdocArg[];
+  } {
+    const keywords: ShdocArg[] = [];
+    const globals: ShdocArg[] = [];
+
+    const listPattern = /<\/p>\s*<ul class="simple">([\s\S]+?)<\/ul>/;
+    const listMatch = sectionHtml.match(listPattern);
+
+    if (listMatch) {
+      const listItemsHtml = listMatch[1];
+      const itemPattern =
+        /<li>\s*<p>\s*([^ ]+)\s+([^ ]+)\s+(keyword|global):\s*([\s\S]+?)<\/p>\s*<\/li>/g;
+      const matches = listItemsHtml.matchAll(itemPattern);
+
+      for (const match of matches) {
+        const item = {
+          name: match[1].trim(),
+          type: match[2].trim(),
+          desc: this.sanitizeText(match[4]),
+        };
+
+        if (match[3] === "keyword") {
+          keywords.push(item);
+        } else {
+          globals.push(item);
+        }
+      }
+    }
+
+    return { keywords, globals };
   }
 
   protected extractArguments(sectionHtml: string): ShdocArg[] {

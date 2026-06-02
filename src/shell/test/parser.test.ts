@@ -177,6 +177,34 @@ suite("HTML Parser Test Suite", () => {
       assert.ok(fn);
       assert.strictEqual(fn.namespace, "");
     });
+
+    test("it should extract keywords from the function section", () => {
+      const fn = functions.find((f) => f.name === "@parametrize");
+      assert.ok(fn);
+      assert.strictEqual(fn.keywords.length, 1);
+      assert.strictEqual(fn.keywords[0].name, "STDLIB_TESTING_PARAMETRIZE_SETTING_DEBUG_BOOLEAN");
+      assert.strictEqual(fn.keywords[0].type, "boolean");
+      assert.strictEqual(fn.keywords[0].desc, "Whether to show debug information (default=”0”).");
+    });
+
+    test("it should extract globals from the function section", () => {
+      const fn = functions.find((f) => f.name === "@parametrize");
+      assert.ok(fn);
+      assert.strictEqual(fn.globals.length, 1);
+      assert.strictEqual(fn.globals[0].name, "STDLIB_TESTING_THEME_PARAMETRIZE_HIGHLIGHT");
+      assert.strictEqual(fn.globals[0].type, "string");
+      assert.strictEqual(fn.globals[0].desc, "A theme colour used to highlight informational messages (default=”LIGHT_BLUE”).");
+    });
+
+    test("it should correctly extract globals for _testing.error", () => {
+      const fn = functions.find(
+        (f) => f.name === "error" && f.namespace === "_testing",
+      );
+      assert.ok(fn);
+      assert.strictEqual(fn.globals.length, 1);
+      assert.strictEqual(fn.globals[0].name, "STDLIB_TESTING_THEME_ERROR");
+      assert.strictEqual(fn.globals[0].type, "string");
+    });
   });
 
   suite("when parsing HTML with escaped entities", () => {

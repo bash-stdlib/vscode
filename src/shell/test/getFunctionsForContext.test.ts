@@ -7,7 +7,7 @@ suite("getFunctionsForContext Logic Test Suite", () => {
   const mockFunctions: ShdocFunction[] = [
     {
       name: "normal_fn",
-      isTesting: false,
+      isTesting: false, globals: [], keywords: [],
       args: [],
       description: "",
       exitcodes: [],
@@ -15,7 +15,7 @@ suite("getFunctionsForContext Logic Test Suite", () => {
     },
     {
       name: "test_fn",
-      isTesting: true,
+      isTesting: true, globals: [], keywords: [],
       args: [],
       description: "",
       exitcodes: [],
