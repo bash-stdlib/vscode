@@ -167,10 +167,7 @@ suite("Completion Provider Test Suite", () => {
     let completions: vscode.CompletionItem[];
 
     setup(async () => {
-      const testFilePath = path.join(
-        __dirname,
-        "../../../../src/test/assets/sample.test.sh",
-      );
+      const testFilePath = path.join(__dirname, "assets/context-aware.test.sh");
       const document = await vscode.workspace.openTextDocument(testFilePath);
 
       const position = new vscode.Position(0, 0); // content doesn't matter much for this test
