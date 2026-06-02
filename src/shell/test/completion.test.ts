@@ -80,6 +80,8 @@ suite("Completion Logic Test Suite", () => {
           description: "",
           exitcodes: [],
           isTesting: false,
+          globals: [],
+          keywords: [],
           options: [],
         },
         {
@@ -89,6 +91,8 @@ suite("Completion Logic Test Suite", () => {
           description: "",
           exitcodes: [],
           isTesting: false,
+          globals: [],
+          keywords: [],
           options: [],
         },
         {
@@ -98,6 +102,8 @@ suite("Completion Logic Test Suite", () => {
           description: "",
           exitcodes: [],
           isTesting: false,
+          globals: [],
+          keywords: [],
           options: [],
         },
       ];
@@ -127,6 +133,8 @@ suite("Completion Logic Test Suite", () => {
           description: "",
           exitcodes: [],
           isTesting: true,
+          globals: [],
+          keywords: [],
           options: [],
         },
         {
@@ -136,6 +144,8 @@ suite("Completion Logic Test Suite", () => {
           description: "",
           exitcodes: [],
           isTesting: true,
+          globals: [],
+          keywords: [],
           options: [],
         },
         {
@@ -145,6 +155,8 @@ suite("Completion Logic Test Suite", () => {
           description: "",
           exitcodes: [],
           isTesting: false,
+          globals: [],
+          keywords: [],
           options: [],
         },
       ];
@@ -230,6 +242,8 @@ suite("Completion Logic Test Suite", () => {
           description: "",
           exitcodes: [],
           isTesting: false,
+          globals: [],
+          keywords: [],
           options: [],
         },
         {
@@ -239,6 +253,8 @@ suite("Completion Logic Test Suite", () => {
           description: "",
           exitcodes: [],
           isTesting: false,
+          globals: [],
+          keywords: [],
           options: [],
         },
         {
@@ -248,6 +264,8 @@ suite("Completion Logic Test Suite", () => {
           description: "",
           exitcodes: [],
           isTesting: false,
+          globals: [],
+          keywords: [],
           options: [],
         },
       ];

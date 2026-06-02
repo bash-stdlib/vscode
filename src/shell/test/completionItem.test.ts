@@ -39,7 +39,11 @@ suite("Completion Item Test Suite", () => {
           { name: "arr", type: "array", desc: "Array" },
         ],
         exitcodes: [{ code: "0", desc: "Success" }],
+        globals: [{ name: "GLOBAL_VAR", type: "string", desc: "A global var" }],
         isTesting: false,
+        keywords: [
+          { name: "KEYWORD_VAR", type: "string", desc: "A keyword var" },
+        ],
         options: [{ flags: "-v", desc: "Verbose" }],
       };
 
@@ -64,6 +68,8 @@ suite("Completion Item Test Suite", () => {
         const doc = (item.documentation as vscode.MarkdownString).value;
         assert.ok(doc.includes("Joins elements."));
         assert.ok(doc.includes("sep"));
+        assert.ok(doc.includes("GLOBAL_VAR"));
+        assert.ok(doc.includes("KEYWORD_VAR"));
         assert.ok(doc.includes("-v"));
         assert.ok(doc.includes("Success"));
       });
@@ -84,7 +90,9 @@ suite("Completion Item Test Suite", () => {
         description: "A simple function.",
         args: [],
         exitcodes: [],
+        globals: [],
         isTesting: false,
+        keywords: [],
         options: [],
       };
 
@@ -112,7 +120,9 @@ suite("Completion Item Test Suite", () => {
           { name: "…", type: "variadic", desc: "Additional arguments" },
         ],
         exitcodes: [],
+        globals: [],
         isTesting: false,
+        keywords: [],
         options: [],
       };
 
@@ -141,7 +151,9 @@ suite("Completion Item Test Suite", () => {
         description: "Reports an error.",
         args: [{ name: "…", type: "variadic", desc: "Error messages" }],
         exitcodes: [],
+        globals: [],
         isTesting: true,
+        keywords: [],
         options: [],
       };
 

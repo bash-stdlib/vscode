@@ -126,6 +126,28 @@ function buildHoverDocumentation(
     markdown.appendMarkdown(`\n`);
   }
 
+  // Keywords
+  if (parsedFunction.keywords && parsedFunction.keywords.length > 0) {
+    markdown.appendMarkdown(`**Keywords:**\n`);
+    parsedFunction.keywords.forEach((keyword) => {
+      markdown.appendMarkdown(
+        `* \`${keyword.name}\` _(${keyword.type})_ - ${keyword.desc}\n`,
+      );
+    });
+    markdown.appendMarkdown(`\n`);
+  }
+
+  // Global Variables
+  if (parsedFunction.globals && parsedFunction.globals.length > 0) {
+    markdown.appendMarkdown(`**Global Variables:**\n`);
+    parsedFunction.globals.forEach((global) => {
+      markdown.appendMarkdown(
+        `* \`${global.name}\` _(${global.type})_ - ${global.desc}\n`,
+      );
+    });
+    markdown.appendMarkdown(`\n`);
+  }
+
   // Options
   if (parsedFunction.options && parsedFunction.options.length > 0) {
     markdown.appendMarkdown(`**Options:**\n`);

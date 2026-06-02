@@ -8,6 +8,8 @@ suite("getFunctionsForContext Logic Test Suite", () => {
     {
       name: "normal_fn",
       isTesting: false,
+      globals: [],
+      keywords: [],
       args: [],
       description: "",
       exitcodes: [],
@@ -16,6 +18,8 @@ suite("getFunctionsForContext Logic Test Suite", () => {
     {
       name: "test_fn",
       isTesting: true,
+      globals: [],
+      keywords: [],
       args: [],
       description: "",
       exitcodes: [],
