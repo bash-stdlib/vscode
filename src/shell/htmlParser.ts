@@ -146,7 +146,7 @@ export class HtmlDocumentationParser {
   protected extractArguments(sectionHtml: string): ShdocArg[] {
     const args: ShdocArg[] = [];
     const argumentsSectionPattern =
-      /<section id="(?:arguments|id\d+)">\s*<h4>Arguments[\s\S]+?<ul[^>]*>([\s\S]+?)<\/ul>/;
+      /<section id="(?:arguments|id\d+)">\s*<h4>\s*Arguments[\s\S]+?<ul[^>]*>([\s\S]+?)<\/ul>/;
     const argumentsSectionMatch = sectionHtml.match(argumentsSectionPattern);
 
     if (argumentsSectionMatch) {
@@ -171,7 +171,7 @@ export class HtmlDocumentationParser {
   protected extractExitCodes(sectionHtml: string): ShdocExitCode[] {
     const exitCodes: ShdocExitCode[] = [];
     const exitCodesSectionPattern =
-      /<section id="(?:exit-codes|id\d+)">\s*<h4>Exit codes[\s\S]+?<ul[^>]*>([\s\S]+?)<\/ul>/;
+      /<section id="(?:exit-codes|id\d+)">\s*<h4>\s*Exit codes[\s\S]+?<ul[^>]*>([\s\S]+?)<\/ul>/;
     const exitCodesSectionMatch = sectionHtml.match(exitCodesSectionPattern);
 
     if (exitCodesSectionMatch) {

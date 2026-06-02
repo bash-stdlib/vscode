@@ -41,7 +41,9 @@ suite("Completion Item Test Suite", () => {
         exitcodes: [{ code: "0", desc: "Success" }],
         globals: [{ name: "GLOBAL_VAR", type: "string", desc: "A global var" }],
         isTesting: false,
-        keywords: [{ name: "KEYWORD_VAR", type: "string", desc: "A keyword var" }],
+        keywords: [
+          { name: "KEYWORD_VAR", type: "string", desc: "A keyword var" },
+        ],
         options: [{ flags: "-v", desc: "Verbose" }],
       };
 
