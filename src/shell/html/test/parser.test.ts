@@ -1,7 +1,7 @@
 import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
-import { HtmlDocumentationParser } from "@/shell/htmlParser";
+import { HtmlDocumentationParser } from "@/shell/html/htmlParser";
 import { ShdocFunction } from "@/shell/shdoc";
 
 suite("HTML Parser Test Suite", () => {

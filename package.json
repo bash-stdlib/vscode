@@ -45,7 +45,7 @@
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "ci": "xvfb-run npm test",
-    "compile": "tsc -p ./ && tsc-alias && mkdir -p out/shell/test/assets && cp src/shell/test/assets/*.html out/shell/test/assets/ && mkdir -p out/shell/providers/test/assets && cp src/shell/providers/test/assets/*.sh out/shell/providers/test/assets/",
+    "compile": "tsc -p ./ && tsc-alias && mkdir -p out/shell/html/test/assets && cp src/shell/html/test/assets/*.html out/shell/html/test/assets/ && mkdir -p out/shell/providers/test/assets && cp src/shell/providers/test/assets/*.sh out/shell/providers/test/assets/",
     "watch": "concurrently --prefix none \"tsc-alias -w\" \"tsc -w\" ",
     "pretest": "npm run compile && npm run lint",
     "pre_commit_prettier": "npx prettier --write",

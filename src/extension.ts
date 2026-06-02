@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { debug } from "@/debug";
-import { DocumentationFetcher } from "@/shell/fetcher";
-import { HtmlDocumentationParser } from "@/shell/htmlParser";
+import { DocumentationFetcher } from "@/shell/html/fetcher";
+import { HtmlDocumentationParser } from "@/shell/html/htmlParser";
 import { createCompletionProvider } from "@/shell/providers/completionProvider";
 import { createHoverProvider } from "@/shell/providers/hoverProvider";
 import { ShdocFunction } from "@/shell/shdoc";

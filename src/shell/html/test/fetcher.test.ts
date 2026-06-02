@@ -1,6 +1,6 @@
 import * as assert from "assert";
 import { ERROR_FETCH_FAILED } from "@/constants";
-import { DocumentationFetcher, DocumentationUrls } from "@/shell/fetcher";
+import { DocumentationFetcher, DocumentationUrls } from "@/shell/html/fetcher";
 
 suite("Fetcher Test Suite", () => {
   const originalFetch = global.fetch;
