@@ -1,5 +1,8 @@
 import * as assert from "assert";
-import { extractFullIdentifier, findFunction } from "@/shell/hoverProvider";
+import {
+  extractFullIdentifier,
+  findFunction,
+} from "@/shell/providers/hoverProvider";
 import { ShdocFunction } from "@/shell/shdoc";
 
 suite("Hover Provider Test Suite", () => {
