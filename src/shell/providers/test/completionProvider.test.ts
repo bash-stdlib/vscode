@@ -148,9 +148,16 @@ suite("Completion Provider Test Suite", () => {
     });
 
     test("it should return functions in that namespace", () => {
-      const joinFn = completions.find((c) => c.label === "join" || c.label === "stdlib.string.join");
-      const splitFn = completions.find((c) => c.label === "split" || c.label === "stdlib.string.split");
-      assert.ok(joinFn, `join not found in: ${completions.map(c => c.label).join(', ')}`);
+      const joinFn = completions.find(
+        (c) => c.label === "join" || c.label === "stdlib.string.join",
+      );
+      const splitFn = completions.find(
+        (c) => c.label === "split" || c.label === "stdlib.string.split",
+      );
+      assert.ok(
+        joinFn,
+        `join not found in: ${completions.map((c) => c.label).join(", ")}`,
+      );
       assert.ok(splitFn);
       assert.strictEqual(joinFn.kind, vscode.CompletionItemKind.Function);
     });
@@ -160,7 +167,10 @@ suite("Completion Provider Test Suite", () => {
     let completions: vscode.CompletionItem[];
 
     setup(async () => {
-      const testFilePath = path.join(__dirname, "../../../../src/test/assets/sample.test.sh");
+      const testFilePath = path.join(
+        __dirname,
+        "../../../../src/test/assets/sample.test.sh",
+      );
       const document = await vscode.workspace.openTextDocument(testFilePath);
 
       const position = new vscode.Position(0, 0); // content doesn't matter much for this test
