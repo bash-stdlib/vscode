@@ -3,6 +3,7 @@ import {
   CONFIG_LINTER_ENABLED,
   CONFIG_LINTER_EXECUTABLE_PATH,
   CONFIG_LINTER_INTERVAL,
+  CONFIG_LINTER_PYTHON_PATH,
   LINTER_SOURCE,
 } from "@/constants";
 import { runLinter } from "@/shell/linter";
@@ -23,6 +24,7 @@ export class LinterProvider {
         if (
           e.affectsConfiguration(CONFIG_LINTER_ENABLED) ||
           e.affectsConfiguration(CONFIG_LINTER_EXECUTABLE_PATH) ||
+          e.affectsConfiguration(CONFIG_LINTER_PYTHON_PATH) ||
           e.affectsConfiguration(CONFIG_LINTER_INTERVAL)
         ) {
           this.doBatchLint();
@@ -51,7 +53,6 @@ export class LinterProvider {
       subscriptions,
     );
 
-    // Lint all open shell files on activation
     this.doBatchLint();
   }
 
@@ -65,7 +66,7 @@ export class LinterProvider {
     }
   }
 
-  private doBatchLint() {
+  protected doBatchLint() {
     if (this.batchTimeout) {
       clearTimeout(this.batchTimeout);
     }
@@ -77,35 +78,21 @@ export class LinterProvider {
       return;
     }
 
-    const interval = config.get<number>(CONFIG_LINTER_INTERVAL, 1000);
+    const interval = config.get<number>(CONFIG_LINTER_INTERVAL, 500);
     this.batchTimeout = setTimeout(async () => {
-      const executablePath = config.get<string>(
-        CONFIG_LINTER_EXECUTABLE_PATH,
-        "",
-      );
-      if (!executablePath) {
-        return;
-      }
-
       const shellDocs = vscode.workspace.textDocuments.filter(
-        (doc) =>
-          doc.languageId === "shellscript" && doc.uri.scheme === "file",
+        (doc) => doc.languageId === "shellscript" && doc.uri.scheme === "file",
       );
       if (shellDocs.length === 0) {
         return;
       }
 
       const filePaths = shellDocs.map((doc) => doc.uri.fsPath);
-      const results = await runLinter(executablePath, filePaths);
-
-      results.forEach((result) => {
-        const uri = vscode.Uri.file(result.filePath);
-        this.diagnosticCollection.set(uri, result.diagnostics);
-      });
+      await this.runLinterForFiles(filePaths);
     }, interval);
   }
 
-  private doLint(textDocument: vscode.TextDocument) {
+  protected doLint(textDocument: vscode.TextDocument) {
     if (
       textDocument.languageId !== "shellscript" ||
       textDocument.uri.scheme !== "file"
@@ -120,29 +107,36 @@ export class LinterProvider {
       return;
     }
 
-    const interval = config.get<number>(CONFIG_LINTER_INTERVAL, 1000);
+    const interval = config.get<number>(CONFIG_LINTER_INTERVAL, 500);
     const uriString = textDocument.uri.toString();
 
     this.clearTimer(uriString);
 
     const timeout = setTimeout(async () => {
-      const executablePath = config.get<string>(
-        CONFIG_LINTER_EXECUTABLE_PATH,
-        "",
-      );
-      if (!executablePath) {
-        return;
-      }
-
-      const results = await runLinter(executablePath, [
-        textDocument.uri.fsPath,
-      ]);
-      if (results.length > 0) {
-        this.diagnosticCollection.set(textDocument.uri, results[0].diagnostics);
-      }
+      await this.runLinterForFiles([textDocument.uri.fsPath]);
     }, interval);
 
     this.timeouts.set(uriString, timeout);
+  }
+
+  private async runLinterForFiles(filePaths: string[]) {
+    const config = vscode.workspace.getConfiguration();
+    const executablePath = config.get<string>(
+      CONFIG_LINTER_EXECUTABLE_PATH,
+      "",
+    );
+    const pythonPath = config.get<string>(CONFIG_LINTER_PYTHON_PATH, "python3");
+
+    if (!executablePath) {
+      return;
+    }
+
+    const results = await runLinter(executablePath, filePaths, pythonPath);
+
+    results.forEach((result) => {
+      const uri = vscode.Uri.file(result.filePath);
+      this.diagnosticCollection.set(uri, result.diagnostics);
+    });
   }
 
   private clearTimer(uriString: string) {

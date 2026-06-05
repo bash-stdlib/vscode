@@ -1,6 +1,7 @@
 export const CONFIG_LINTER_ENABLED = "bash-stdlib.linter.enabled";
 export const CONFIG_LINTER_EXECUTABLE_PATH =
   "bash-stdlib.linter.executablePath";
+export const CONFIG_LINTER_PYTHON_PATH = "bash-stdlib.linter.pythonPath";
 export const CONFIG_LINTER_INTERVAL = "bash-stdlib.linter.interval";
 export const ERROR_FETCH_FAILED = "Failed to fetch documentation";
 export const LINTER_SOURCE = "bash-stdlib-lint";

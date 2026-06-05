@@ -10,6 +10,11 @@ suite("when the linter is executed", () => {
     execStub = sinon.stub(linterProcess, "exec");
 
     execStub.callsFake(async (command: string) => {
+      if (!command.startsWith('"python3"')) {
+        throw new Error(
+          `Expected command to start with pythonPath, but got: ${command}`,
+        );
+      }
       if (command.includes("success.sh")) {
         return { stdout: "[]", stderr: "" };
       } else if (
@@ -88,13 +93,13 @@ Cache saved to .bash_stdlib_cache.json
   });
 
   test("then it should return an empty array for no errors", async () => {
-    const results = await runLinter("linter.py", ["success.sh"]);
+    const results = await runLinter("linter.py", ["success.sh"], "python3");
     assert.strictEqual(results.length, 1);
     assert.strictEqual(results[0].diagnostics.length, 0);
   });
 
   test("then it should parse errors correctly", async () => {
-    const results = await runLinter("linter.py", ["error.sh"]);
+    const results = await runLinter("linter.py", ["error.sh"], "python3");
     assert.strictEqual(results.length, 1);
     const diagnostics = results[0].diagnostics;
     assert.strictEqual(diagnostics.length, 1);
@@ -108,7 +113,11 @@ Cache saved to .bash_stdlib_cache.json
   });
 
   test("then it should handle multiple files", async () => {
-    const results = await runLinter("linter.py", ["error.sh", "error2.sh"]);
+    const results = await runLinter(
+      "linter.py",
+      ["error.sh", "error2.sh"],
+      "python3",
+    );
     assert.strictEqual(results.length, 2);
 
     const res1 = results.find((r) => r.filePath === "error.sh");
@@ -123,7 +132,11 @@ Cache saved to .bash_stdlib_cache.json
   });
 
   test("then it should handle mixed output with extra text", async () => {
-    const results = await runLinter("linter.py", ["mixed_output.sh"]);
+    const results = await runLinter(
+      "linter.py",
+      ["mixed_output.sh"],
+      "python3",
+    );
     assert.strictEqual(results.length, 1);
     const diagnostics = results[0].diagnostics;
     assert.strictEqual(diagnostics.length, 1);

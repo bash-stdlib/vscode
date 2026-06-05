@@ -43,9 +43,14 @@
           "default": "",
           "description": "The path to the linter executable (main.py)."
         },
+        "bash-stdlib.linter.pythonPath": {
+          "type": "string",
+          "default": "python3",
+          "description": "The path to the python binary to use for running the linter."
+        },
         "bash-stdlib.linter.interval": {
           "type": "number",
-          "default": 1000,
+          "default": 500,
           "description": "The interval (in milliseconds) at which to run the linter while editing."
         }
       }

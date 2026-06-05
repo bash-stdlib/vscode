@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import * as childProcess from "child_process";
 import { promisify } from "util";
+import { debug } from "@/debug";
 
 export const linterProcess = {
   exec: promisify(childProcess.exec),
@@ -14,20 +15,25 @@ export interface LinterResult {
 export async function runLinter(
   executablePath: string,
   filePaths: string[],
+  pythonPath: string = "python3",
 ): Promise<LinterResult[]> {
   if (!executablePath || filePaths.length === 0) {
     return [];
   }
 
   const quotedPaths = filePaths.map((p) => `"${p}"`).join(" ");
+  const command = `"${pythonPath}" "${executablePath}" check --format vscode ${quotedPaths}`;
+
+  debug(`Running linter command: ${command}`);
 
   try {
-    const { stdout } = await linterProcess.exec(
-      `python3 "${executablePath}" check --format vscode ${quotedPaths}`,
-    );
+    const { stdout } = await linterProcess.exec(command);
+    debug(`Linter output: ${stdout}`);
     return parseLinterOutput(stdout, filePaths);
   } catch (error: any) {
+    debug(`Linter failed with error: ${error.message}`);
     if (error.stdout) {
+      debug(`Linter partial output: ${error.stdout}`);
       return parseLinterOutput(error.stdout, filePaths);
     }
     console.error("Linter execution failed:", error);
