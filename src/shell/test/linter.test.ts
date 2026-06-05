@@ -54,16 +54,22 @@ Cache saved to .bash_stdlib_cache.json
   });
 
   test("then it should return an empty array for no errors", async () => {
-    const diagnostics = await runLinter("linter.py", "success.sh");
-    assert.strictEqual(diagnostics.length, 0);
+    const results = await runLinter("linter.py", ["success.sh"]);
+    assert.strictEqual(results.length, 1);
+    assert.strictEqual(results[0].diagnostics.length, 0);
   });
 
   test("then it should parse errors correctly", async () => {
-    const diagnostics = await runLinter("linter.py", "error.sh");
+    const results = await runLinter("linter.py", ["error.sh"]);
+    assert.strictEqual(results.length, 1);
+    const diagnostics = results[0].diagnostics;
     assert.strictEqual(diagnostics.length, 1);
     assert.strictEqual(diagnostics[0].message, "Test error message");
     assert.strictEqual(diagnostics[0].code, "STD001");
-    assert.strictEqual(diagnostics[0].severity, vscode.DiagnosticSeverity.Error);
+    assert.strictEqual(
+      diagnostics[0].severity,
+      vscode.DiagnosticSeverity.Error,
+    );
     assert.strictEqual(diagnostics[0].range.start.line, 0);
     assert.strictEqual(diagnostics[0].range.start.character, 0);
     assert.strictEqual(diagnostics[0].range.end.line, 0);
@@ -71,7 +77,9 @@ Cache saved to .bash_stdlib_cache.json
   });
 
   test("then it should handle mixed output with extra text", async () => {
-    const diagnostics = await runLinter("linter.py", "mixed_output.sh");
+    const results = await runLinter("linter.py", ["mixed_output.sh"]);
+    assert.strictEqual(results.length, 1);
+    const diagnostics = results[0].diagnostics;
     assert.strictEqual(diagnostics.length, 1);
     assert.strictEqual(diagnostics[0].message, "Mixed output error");
     assert.strictEqual(diagnostics[0].range.start.line, 1);

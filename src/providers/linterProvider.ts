@@ -12,7 +12,8 @@ export class LinterProvider {
   private timeouts: Map<string, NodeJS.Timeout> = new Map();
 
   constructor() {
-    this.diagnosticCollection = vscode.languages.createDiagnosticCollection(LINTER_SOURCE);
+    this.diagnosticCollection =
+      vscode.languages.createDiagnosticCollection(LINTER_SOURCE);
   }
 
   public activate(subscriptions: vscode.Disposable[]) {
@@ -23,14 +24,18 @@ export class LinterProvider {
           e.affectsConfiguration(CONFIG_LINTER_EXECUTABLE_PATH) ||
           e.affectsConfiguration(CONFIG_LINTER_INTERVAL)
         ) {
-          vscode.workspace.textDocuments.forEach(this.doLint, this);
+          vscode.workspace.textDocuments.forEach((doc) => this.doLint(doc));
         }
       },
       this,
       subscriptions,
     );
 
-    vscode.workspace.onDidOpenTextDocument(this.doLint, this, subscriptions);
+    vscode.workspace.onDidOpenTextDocument(
+      (doc) => this.doLint(doc),
+      this,
+      subscriptions,
+    );
     vscode.workspace.onDidChangeTextDocument(
       (e) => this.doLint(e.document),
       this,
@@ -46,7 +51,7 @@ export class LinterProvider {
     );
 
     // Lint all open shell files on activation
-    vscode.workspace.textDocuments.forEach(this.doLint, this);
+    vscode.workspace.textDocuments.forEach((doc) => this.doLint(doc));
   }
 
   public dispose() {
@@ -74,13 +79,22 @@ export class LinterProvider {
     this.clearTimer(uriString);
 
     const timeout = setTimeout(async () => {
-      const executablePath = config.get<string>(CONFIG_LINTER_EXECUTABLE_PATH, "");
+      const executablePath = config.get<string>(
+        CONFIG_LINTER_EXECUTABLE_PATH,
+        "",
+      );
       if (!executablePath) {
         return;
       }
 
-      const diagnostics = await runLinter(executablePath, textDocument.uri.fsPath);
-      this.diagnosticCollection.set(textDocument.uri, diagnostics);
+      // We run one by one because the linter's vscode format doesn't currently
+      // include the filename to distinguish diagnostics for multiple files.
+      const results = await runLinter(executablePath, [
+        textDocument.uri.fsPath,
+      ]);
+      if (results.length > 0) {
+        this.diagnosticCollection.set(textDocument.uri, results[0].diagnostics);
+      }
     }, interval);
 
     this.timeouts.set(uriString, timeout);
