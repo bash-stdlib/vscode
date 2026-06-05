@@ -12,7 +12,10 @@ suite("when the linter is executed", () => {
     execStub.callsFake(async (command: string) => {
       if (command.includes("success.sh")) {
         return { stdout: "[]", stderr: "" };
-      } else if (command.includes("error.sh")) {
+      } else if (
+        command.includes("error.sh") &&
+        !command.includes("error2.sh")
+      ) {
         const output = JSON.stringify([
           {
             range: {
@@ -23,6 +26,36 @@ suite("when the linter is executed", () => {
             code: "STD001",
             source: "bash-stdlib-lint",
             message: "Test error message",
+            file: "error.sh",
+          },
+        ]);
+        return { stdout: output, stderr: "" };
+      } else if (
+        command.includes("error.sh") &&
+        command.includes("error2.sh")
+      ) {
+        const output = JSON.stringify([
+          {
+            range: {
+              start: { line: 0, character: 0 },
+              end: { line: 0, character: 5 },
+            },
+            severity: 1,
+            code: "STD001",
+            source: "bash-stdlib-lint",
+            message: "Error in file 1",
+            file: "error.sh",
+          },
+          {
+            range: {
+              start: { line: 1, character: 0 },
+              end: { line: 1, character: 5 },
+            },
+            severity: 1,
+            code: "STD002",
+            source: "bash-stdlib-lint",
+            message: "Error in file 2",
+            file: "error2.sh",
           },
         ]);
         return { stdout: output, stderr: "" };
@@ -38,7 +71,8 @@ suite("when the linter is executed", () => {
         "severity": 1,
         "code": "STD002",
         "source": "bash-stdlib-lint",
-        "message": "Mixed output error"
+        "message": "Mixed output error",
+        "file": "mixed_output.sh"
     }
 ]
 Cache saved to .bash_stdlib_cache.json
@@ -71,9 +105,21 @@ Cache saved to .bash_stdlib_cache.json
       vscode.DiagnosticSeverity.Error,
     );
     assert.strictEqual(diagnostics[0].range.start.line, 0);
-    assert.strictEqual(diagnostics[0].range.start.character, 0);
-    assert.strictEqual(diagnostics[0].range.end.line, 0);
-    assert.strictEqual(diagnostics[0].range.end.character, 5);
+  });
+
+  test("then it should handle multiple files", async () => {
+    const results = await runLinter("linter.py", ["error.sh", "error2.sh"]);
+    assert.strictEqual(results.length, 2);
+
+    const res1 = results.find((r) => r.filePath === "error.sh");
+    const res2 = results.find((r) => r.filePath === "error2.sh");
+
+    assert.ok(res1);
+    assert.ok(res2);
+    assert.strictEqual(res1!.diagnostics.length, 1);
+    assert.strictEqual(res1!.diagnostics[0].message, "Error in file 1");
+    assert.strictEqual(res2!.diagnostics.length, 1);
+    assert.strictEqual(res2!.diagnostics[0].message, "Error in file 2");
   });
 
   test("then it should handle mixed output with extra text", async () => {

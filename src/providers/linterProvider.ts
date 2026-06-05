@@ -10,6 +10,7 @@ import { runLinter } from "@/shell/linter";
 export class LinterProvider {
   private diagnosticCollection: vscode.DiagnosticCollection;
   private timeouts: Map<string, NodeJS.Timeout> = new Map();
+  private batchTimeout: NodeJS.Timeout | undefined;
 
   constructor() {
     this.diagnosticCollection =
@@ -24,7 +25,7 @@ export class LinterProvider {
           e.affectsConfiguration(CONFIG_LINTER_EXECUTABLE_PATH) ||
           e.affectsConfiguration(CONFIG_LINTER_INTERVAL)
         ) {
-          vscode.workspace.textDocuments.forEach((doc) => this.doLint(doc));
+          this.doBatchLint();
         }
       },
       this,
@@ -51,7 +52,7 @@ export class LinterProvider {
     );
 
     // Lint all open shell files on activation
-    vscode.workspace.textDocuments.forEach((doc) => this.doLint(doc));
+    this.doBatchLint();
   }
 
   public dispose() {
@@ -59,6 +60,48 @@ export class LinterProvider {
     this.diagnosticCollection.dispose();
     this.timeouts.forEach((t) => clearTimeout(t));
     this.timeouts.clear();
+    if (this.batchTimeout) {
+      clearTimeout(this.batchTimeout);
+    }
+  }
+
+  private doBatchLint() {
+    if (this.batchTimeout) {
+      clearTimeout(this.batchTimeout);
+    }
+
+    const config = vscode.workspace.getConfiguration();
+    const enabled = config.get<boolean>(CONFIG_LINTER_ENABLED, false);
+    if (!enabled) {
+      this.diagnosticCollection.clear();
+      return;
+    }
+
+    const interval = config.get<number>(CONFIG_LINTER_INTERVAL, 1000);
+    this.batchTimeout = setTimeout(async () => {
+      const executablePath = config.get<string>(
+        CONFIG_LINTER_EXECUTABLE_PATH,
+        "",
+      );
+      if (!executablePath) {
+        return;
+      }
+
+      const shellDocs = vscode.workspace.textDocuments.filter(
+        (doc) => doc.languageId === "shellscript",
+      );
+      if (shellDocs.length === 0) {
+        return;
+      }
+
+      const filePaths = shellDocs.map((doc) => doc.uri.fsPath);
+      const results = await runLinter(executablePath, filePaths);
+
+      results.forEach((result) => {
+        const uri = vscode.Uri.file(result.filePath);
+        this.diagnosticCollection.set(uri, result.diagnostics);
+      });
+    }, interval);
   }
 
   private doLint(textDocument: vscode.TextDocument) {
@@ -87,8 +130,6 @@ export class LinterProvider {
         return;
       }
 
-      // We run one by one because the linter's vscode format doesn't currently
-      // include the filename to distinguish diagnostics for multiple files.
       const results = await runLinter(executablePath, [
         textDocument.uri.fsPath,
       ]);
