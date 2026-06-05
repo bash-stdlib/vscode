@@ -32,6 +32,21 @@
           "type": "boolean",
           "default": false,
           "description": "Enable debug logging for completion provider activity in the debug console."
+        },
+        "bash-stdlib.linter.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable the external linter for shell files."
+        },
+        "bash-stdlib.linter.executablePath": {
+          "type": "string",
+          "default": "",
+          "description": "The path to the linter executable (main.py)."
+        },
+        "bash-stdlib.linter.interval": {
+          "type": "number",
+          "default": 1000,
+          "description": "The interval (in milliseconds) at which to run the linter while editing."
         }
       }
     },
@@ -56,6 +71,7 @@
     "@types/jest": "^30.0.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.19.17",
+    "@types/sinon": "^21.0.1",
     "@types/vscode": "^1.118.0",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2",
@@ -64,6 +80,7 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-unused-imports": "^4.4.1",
     "prettier": "^3.8.3",
+    "sinon": "^22.0.0",
     "tsc-alias": "^1.8.17",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
