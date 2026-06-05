@@ -41,7 +41,7 @@
         "bash-stdlib.linter.executablePath": {
           "type": "string",
           "default": "",
-          "description": "The path to the linter executable (main.py)."
+          "description": "The path to the stdlib linter script (main.py)."
         },
         "bash-stdlib.linter.pythonPath": {
           "type": "string",

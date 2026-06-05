@@ -9,9 +9,9 @@ import {
 import { runLinter } from "@/shell/linter";
 
 export class LinterProvider {
-  private diagnosticCollection: vscode.DiagnosticCollection;
-  private timeouts: Map<string, NodeJS.Timeout> = new Map();
-  private batchTimeout: NodeJS.Timeout | undefined;
+  protected diagnosticCollection: vscode.DiagnosticCollection;
+  protected timeouts: Map<string, NodeJS.Timeout> = new Map();
+  protected batchTimeout: NodeJS.Timeout | undefined;
 
   constructor() {
     this.diagnosticCollection =
@@ -119,7 +119,7 @@ export class LinterProvider {
     this.timeouts.set(uriString, timeout);
   }
 
-  private async runLinterForFiles(filePaths: string[]) {
+  protected async runLinterForFiles(filePaths: string[]) {
     const config = vscode.workspace.getConfiguration();
     const executablePath = config.get<string>(
       CONFIG_LINTER_EXECUTABLE_PATH,
@@ -139,7 +139,7 @@ export class LinterProvider {
     });
   }
 
-  private clearTimer(uriString: string) {
+  protected clearTimer(uriString: string) {
     const existingTimeout = this.timeouts.get(uriString);
     if (existingTimeout) {
       clearTimeout(existingTimeout);
