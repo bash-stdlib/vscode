@@ -88,7 +88,8 @@ export class LinterProvider {
       }
 
       const shellDocs = vscode.workspace.textDocuments.filter(
-        (doc) => doc.languageId === "shellscript",
+        (doc) =>
+          doc.languageId === "shellscript" && doc.uri.scheme === "file",
       );
       if (shellDocs.length === 0) {
         return;
@@ -105,7 +106,10 @@ export class LinterProvider {
   }
 
   private doLint(textDocument: vscode.TextDocument) {
-    if (textDocument.languageId !== "shellscript") {
+    if (
+      textDocument.languageId !== "shellscript" ||
+      textDocument.uri.scheme !== "file"
+    ) {
       return;
     }
 
