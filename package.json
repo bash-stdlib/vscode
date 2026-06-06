@@ -59,7 +59,7 @@
             "type": "string"
           },
           "default": [],
-          "description": "Extra namespaces to be added to the stdlib root. Used for development purposes."
+          "description": "Extra namespaces to inject. Used for development purposes."
         }
       }
     },
