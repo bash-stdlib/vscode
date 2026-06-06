@@ -30,8 +30,8 @@ suite("LinterProvider Test Suite", () => {
       const configStub = {
         get: sandbox.stub(),
       };
-      configStub
-        .get.withArgs("bash-stdlib.linter.executablePath", "")
+      configStub.get
+        .withArgs("bash-stdlib.linter.executablePath", "")
         .returns("main.py");
       configStub.get.withArgs(CONFIG_EXTRA_NAMESPACES, []).returns(["extra"]);
 

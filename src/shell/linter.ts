@@ -26,8 +26,8 @@ export async function runLinter(
   let command = `"${pythonPath}" "${executablePath}" check --format vscode ${quotedPaths}`;
 
   if (extraNamespaces.length > 0) {
-    const namespaces = extraNamespaces.join(" ");
-    command += ` -a ${namespaces}`;
+    const quotedNamespaces = extraNamespaces.map((ns) => `"${ns}"`).join(" ");
+    command += ` -a ${quotedNamespaces}`;
   }
 
   debug(`Running linter command: ${command}`);

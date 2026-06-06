@@ -117,7 +117,7 @@ Cache saved to .bash_stdlib_cache.json
 
     const lastCall = execStub.lastCall;
     const command = lastCall.args[0];
-    assert.ok(command.includes("-a extra ns"));
+    assert.ok(command.includes('-a "extra" "ns"'));
   });
 
   test("then it should handle multiple files", async () => {
