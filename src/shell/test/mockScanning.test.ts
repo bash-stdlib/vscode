@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import * as assert from "assert";
-import { getActiveMocks } from "@/shell/context";
+import { getActiveMocks } from "@/providers/completion/mocks";
 
 suite("getActiveMocks Logic Test Suite", () => {
   function createMockDocument(content: string): vscode.TextDocument {
