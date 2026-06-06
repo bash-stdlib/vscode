@@ -14,12 +14,15 @@ import { ShdocFunction } from "@/shell/shdoc";
 
 export function createCompletionProvider(
   allFunctions: ShdocFunction[],
+  mockTemplates: ShdocFunction[],
 ): vscode.CompletionItemProvider {
   return {
     provideCompletionItems(document, position) {
       const functionsAvailableInContext = getFunctionsForContext(
         allFunctions,
+        mockTemplates,
         document,
+        position,
       );
 
       const lineText = document

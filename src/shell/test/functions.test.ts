@@ -10,6 +10,7 @@ suite("loadFunctions Test Suite", () => {
   let originalFetcherFetch: DocumentationFetcher["fetch"];
   let originalParserParse: HtmlDocumentationParser["parse"];
   let allFunctions: ShdocFunction[];
+  let mockTemplates: ShdocFunction[];
 
   setup(async () => {
     originalGetConfiguration = vscode.workspace.getConfiguration;
@@ -17,7 +18,10 @@ suite("loadFunctions Test Suite", () => {
       ({ get: () => "en" }) as unknown as vscode.WorkspaceConfiguration;
 
     originalFetcherFetch = DocumentationFetcher.prototype.fetch;
-    DocumentationFetcher.prototype.fetch = async () => {
+    DocumentationFetcher.prototype.fetch = async (url: string) => {
+      if (url.includes("REFERENCE_MOCK_OBJECT.html")) {
+        return `<section id="object"> <h3>object</h3> <p>Mock description</p> </section>`;
+      }
       return `<section id="normal.fn"> <h3>normal.fn</h3> <p>Normal function description</p> </section>`;
     };
 
@@ -26,6 +30,22 @@ suite("loadFunctions Test Suite", () => {
       html: string,
       options: { isTesting: boolean },
     ) => {
+      if (html.includes('id="object"')) {
+        return [
+          {
+            name: "object",
+            namespace: "",
+            description: "Mock description",
+            args: [],
+            globals: [],
+            keywords: [],
+            options: [],
+            exitcodes: [],
+            isTesting: true,
+          },
+        ];
+      }
+
       const name = options.isTesting ? "test_fn" : "normal_fn";
       return [
         {
@@ -42,7 +62,9 @@ suite("loadFunctions Test Suite", () => {
       ];
     };
 
-    allFunctions = await loadFunctions();
+    const result = await loadFunctions();
+    allFunctions = result.allFunctions;
+    mockTemplates = result.mockTemplates;
 
     vscode.workspace.getConfiguration = originalGetConfiguration;
     DocumentationFetcher.prototype.fetch = originalFetcherFetch;
@@ -63,5 +85,10 @@ suite("loadFunctions Test Suite", () => {
     const testFn = allFunctions.find((fn) => fn.isTesting);
     assert.ok(testFn);
     assert.strictEqual(testFn.name, "test_fn");
+  });
+
+  test("it should include mock templates", () => {
+    assert.strictEqual(mockTemplates.length, 1);
+    assert.strictEqual(mockTemplates[0].name, "object");
   });
 });

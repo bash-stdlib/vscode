@@ -6,14 +6,14 @@ import { loadFunctions } from "@/shell/functions";
 import { getAlphanumericTriggers } from "@/triggers";
 
 export async function activate(context: vscode.ExtensionContext) {
-  const functions = await loadFunctions();
+  const { allFunctions, mockTemplates } = await loadFunctions();
 
   const linterProvider = new LinterProvider();
   linterProvider.activate(context.subscriptions);
 
   const completionProvider = vscode.languages.registerCompletionItemProvider(
     "shellscript",
-    createCompletionProvider(functions),
+    createCompletionProvider(allFunctions, mockTemplates),
     ".",
     "@",
     ...getAlphanumericTriggers(),
@@ -21,7 +21,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const hoverProvider = vscode.languages.registerHoverProvider(
     "shellscript",
-    createHoverProvider(functions),
+    createHoverProvider(allFunctions, mockTemplates),
   );
 
   context.subscriptions.push(completionProvider, hoverProvider, linterProvider);
