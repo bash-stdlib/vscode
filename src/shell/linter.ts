@@ -23,12 +23,14 @@ export async function runLinter(
   }
 
   const quotedPaths = filePaths.map((p) => `"${p}"`).join(" ");
-  let command = `"${pythonPath}" "${executablePath}" check --format vscode ${quotedPaths}`;
+  let command = `"${pythonPath}" "${executablePath}" check --format vscode`;
 
   if (extraNamespaces.length > 0) {
     const quotedNamespaces = extraNamespaces.map((ns) => `"${ns}"`).join(" ");
     command += ` -a ${quotedNamespaces}`;
   }
+
+  command += ` ${quotedPaths}`;
 
   debug(`Running linter command: ${command}`);
 
