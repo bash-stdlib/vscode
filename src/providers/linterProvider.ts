@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import {
+  CONFIG_EXTRA_NAMESPACES,
   CONFIG_LINTER_ENABLED,
   CONFIG_LINTER_EXECUTABLE_PATH,
   CONFIG_LINTER_INTERVAL,
@@ -25,7 +26,8 @@ export class LinterProvider {
           e.affectsConfiguration(CONFIG_LINTER_ENABLED) ||
           e.affectsConfiguration(CONFIG_LINTER_EXECUTABLE_PATH) ||
           e.affectsConfiguration(CONFIG_LINTER_PYTHON_PATH) ||
-          e.affectsConfiguration(CONFIG_LINTER_INTERVAL)
+          e.affectsConfiguration(CONFIG_LINTER_INTERVAL) ||
+          e.affectsConfiguration(CONFIG_EXTRA_NAMESPACES)
         ) {
           this.doBatchLint();
         }
@@ -131,7 +133,13 @@ export class LinterProvider {
       return;
     }
 
-    const results = await runLinter(executablePath, filePaths, pythonPath);
+    const extraNamespaces = config.get<string[]>(CONFIG_EXTRA_NAMESPACES, []);
+    const results = await runLinter(
+      executablePath,
+      filePaths,
+      pythonPath,
+      extraNamespaces,
+    );
 
     results.forEach((result) => {
       const uri = vscode.Uri.file(result.filePath);

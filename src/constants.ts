@@ -1,3 +1,4 @@
+export const CONFIG_EXTRA_NAMESPACES = "bash-stdlib.extraNamespaces";
 export const CONFIG_LINTER_ENABLED = "bash-stdlib.linter.enabled";
 export const CONFIG_LINTER_EXECUTABLE_PATH =
   "bash-stdlib.linter.executablePath";

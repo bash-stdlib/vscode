@@ -22,12 +22,17 @@ export function getNextNamespaceLevels(
   functions: ShdocFunction[],
   currentNamespace: string,
   filter?: string,
+  extraNamespaces: string[] = [],
 ): { [key: string]: string } {
   const prefix = currentNamespace ? currentNamespace + "." : "";
   const levels: { [key: string]: string } = {};
 
-  functions.forEach((fn) => {
-    const fullNamespace = fn.namespace || "";
+  const allNamespaces = [
+    ...functions.map((fn) => fn.namespace || ""),
+    ...extraNamespaces,
+  ];
+
+  allNamespaces.forEach((fullNamespace) => {
     if (prefix === "" && fullNamespace !== "") {
       const nextLevel = fullNamespace.split(".")[0];
       levels[nextLevel] = nextLevel;

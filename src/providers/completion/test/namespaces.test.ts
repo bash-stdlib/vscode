@@ -228,6 +228,70 @@ suite("Namespace Test Suite", () => {
           assert.ok("stdlib" in filtered);
         });
       });
+
+      suite("when there are extra namespaces", () => {
+        let nextLevels: { [key: string]: string };
+        const functions: ShdocFunction[] = [
+          {
+            name: "fn1",
+            namespace: "stdlib.string",
+            args: [],
+            description: "",
+            exitcodes: [],
+            isTesting: false,
+            globals: [],
+            keywords: [],
+            options: [],
+          },
+        ];
+
+        suite("at the root level", () => {
+          setup(() => {
+            nextLevels = getNextNamespaceLevels(functions, "", undefined, [
+              "custom",
+            ]);
+          });
+
+          test("it should include the extra namespace", () => {
+            assert.ok("custom" in nextLevels);
+            assert.strictEqual(nextLevels["custom"], "custom");
+          });
+
+          test("it should still include standard namespaces", () => {
+            assert.ok("stdlib" in nextLevels);
+          });
+        });
+
+        suite("at a nested level", () => {
+          setup(() => {
+            nextLevels = getNextNamespaceLevels(
+              functions,
+              "custom",
+              undefined,
+              ["custom.sub"],
+            );
+          });
+
+          test("it should include the nested extra namespace", () => {
+            assert.ok("sub" in nextLevels);
+            assert.strictEqual(nextLevels["sub"], "custom.sub");
+          });
+        });
+
+        suite("with filtering", () => {
+          setup(() => {
+            nextLevels = getNextNamespaceLevels(functions, "", "cus", [
+              "custom",
+              "other",
+            ]);
+          });
+
+          test("it should return only the matching extra namespace", () => {
+            assert.strictEqual(Object.keys(nextLevels).length, 1);
+            assert.ok("custom" in nextLevels);
+          });
+        });
+      });
     });
   });
 

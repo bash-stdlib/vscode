@@ -52,6 +52,14 @@
           "type": "number",
           "default": 500,
           "description": "The interval (in milliseconds) at which to run the linter while editing."
+        },
+        "bash-stdlib.extraNamespaces": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Extra namespaces to be added to the stdlib root. Used for development purposes."
         }
       }
     },

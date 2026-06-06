@@ -16,13 +16,19 @@ export async function runLinter(
   executablePath: string,
   filePaths: string[],
   pythonPath: string = "python3",
+  extraNamespaces: string[] = [],
 ): Promise<LinterResult[]> {
   if (!executablePath || filePaths.length === 0) {
     return [];
   }
 
   const quotedPaths = filePaths.map((p) => `"${p}"`).join(" ");
-  const command = `"${pythonPath}" "${executablePath}" check --format vscode ${quotedPaths}`;
+  let command = `"${pythonPath}" "${executablePath}" check --format vscode ${quotedPaths}`;
+
+  if (extraNamespaces.length > 0) {
+    const namespaces = extraNamespaces.join(" ");
+    command += ` -a ${namespaces}`;
+  }
 
   debug(`Running linter command: ${command}`);
 

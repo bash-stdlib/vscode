@@ -112,6 +112,14 @@ Cache saved to .bash_stdlib_cache.json
     assert.strictEqual(diagnostics[0].range.start.line, 0);
   });
 
+  test("then it should include extra namespaces in the command with -a", async () => {
+    await runLinter("linter.py", ["success.sh"], "python3", ["extra", "ns"]);
+
+    const lastCall = execStub.lastCall;
+    const command = lastCall.args[0];
+    assert.ok(command.includes("-a extra ns"));
+  });
+
   test("then it should handle multiple files", async () => {
     const results = await runLinter(
       "linter.py",
