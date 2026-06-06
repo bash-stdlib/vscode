@@ -3,7 +3,7 @@ import * as assert from "assert";
 import { getFunctionsForContext } from "@/shell/context";
 import { ShdocFunction } from "@/shell/shdoc";
 
-suite("getFunctionsForContext Logic Test Suite", () => {
+suite("getFunctionsForContext", () => {
   const mockFunctions: ShdocFunction[] = [
     {
       name: "normal_fn",

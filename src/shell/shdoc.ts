@@ -26,7 +26,7 @@ export interface ShdocFunction {
   options: ShdocOption[];
 }
 
-export interface BashStdlibFunctions {
+export interface BashStdlib {
   allFunctions: ShdocFunction[];
   mockTemplates: ShdocFunction[];
 }

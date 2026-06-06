@@ -2,7 +2,7 @@ import * as assert from "assert";
 import { generateMockFunctions } from "@/providers/completion/mocks";
 import { ShdocFunction } from "@/shell/shdoc";
 
-suite("generateMockFunctions Logic Test Suite", () => {
+suite("generateMockFunctions", () => {
   const templates: ShdocFunction[] = [
     {
       name: "object",

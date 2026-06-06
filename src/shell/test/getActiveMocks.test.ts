@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import * as assert from "assert";
 import { getActiveMocks } from "@/providers/completion/mocks";
 
-suite("getActiveMocks Logic Test Suite", () => {
+suite("getActiveMocks", () => {
   function createMockDocument(content: string): vscode.TextDocument {
     return {
       getText: (range?: vscode.Range) => {

@@ -2,9 +2,9 @@ import * as vscode from "vscode";
 import { debug } from "@/debug";
 import { DocumentationFetcher } from "@/shell/html/fetcher";
 import { HtmlDocumentationParser } from "@/shell/html/htmlParser";
-import { BashStdlibFunctions } from "@/shell/shdoc";
+import { BashStdlib } from "@/shell/shdoc";
 
-export async function loadFunctions(): Promise<BashStdlibFunctions> {
+export async function loadFunctions(): Promise<BashStdlib> {
   const config = vscode.workspace.getConfiguration("bash-stdlib");
   const language = config.get<string>("documentationLanguage") || "en";
 
