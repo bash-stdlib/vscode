@@ -7,6 +7,8 @@ export const ERROR_FETCH_FAILED = "Failed to fetch documentation";
 export const LINTER_SOURCE = "bash-stdlib-lint";
 export const MESSAGE_NO_DESCRIPTION = "No description provided.";
 export const MESSAGE_PREFIX = "Bash STDLIB:";
+export const URL_MOCK_OBJECT_DOC_TEMPLATE =
+  "https://bash-stdlib.readthedocs.io/{lang}/latest/reference_testing/src/testing/mock/REFERENCE_MOCK_OBJECT.html";
 export const URL_STANDARD_DOC_TEMPLATE =
   "https://bash-stdlib.readthedocs.io/{lang}/latest/reference/src/REFERENCE_COMPLETE.html";
 export const URL_TESTING_DOC_TEMPLATE =

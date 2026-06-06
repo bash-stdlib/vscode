@@ -62,7 +62,7 @@ suite("Completion Provider Test Suite", () => {
     },
   ];
 
-  const provider = createCompletionProvider(mockFunctions);
+  const provider = createCompletionProvider(mockFunctions, []);
 
   suite("when providing root completions", () => {
     let completions: vscode.CompletionItem[];

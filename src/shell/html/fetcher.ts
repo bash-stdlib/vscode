@@ -2,11 +2,13 @@ import * as vscode from "vscode";
 import {
   MESSAGE_PREFIX,
   ERROR_FETCH_FAILED,
+  URL_MOCK_OBJECT_DOC_TEMPLATE,
   URL_STANDARD_DOC_TEMPLATE,
   URL_TESTING_DOC_TEMPLATE,
 } from "@/constants";
 
 export interface DocumentationUrls {
+  mockTemplates: string;
   normal: string;
   testing: string;
 }
@@ -14,6 +16,7 @@ export interface DocumentationUrls {
 export class DocumentationFetcher {
   public getUrls(language: string): DocumentationUrls {
     return {
+      mockTemplates: URL_MOCK_OBJECT_DOC_TEMPLATE.replace("{lang}", language),
       normal: URL_STANDARD_DOC_TEMPLATE.replace("{lang}", language),
       testing: URL_TESTING_DOC_TEMPLATE.replace("{lang}", language),
     };

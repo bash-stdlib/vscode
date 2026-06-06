@@ -25,3 +25,8 @@ export interface ShdocFunction {
   namespace?: string;
   options: ShdocOption[];
 }
+
+export interface BashStdlibFunctions {
+  allFunctions: ShdocFunction[];
+  mockTemplates: ShdocFunction[];
+}

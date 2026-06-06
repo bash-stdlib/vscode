@@ -5,12 +5,15 @@ import { ShdocFunction } from "@/shell/shdoc";
 
 export function createHoverProvider(
   allFunctions: ShdocFunction[],
+  mockTemplates: ShdocFunction[],
 ): vscode.HoverProvider {
   return {
     provideHover(document, position) {
       const functionsAvailableInContext = getFunctionsForContext(
         allFunctions,
+        mockTemplates,
         document,
+        position,
       );
 
       const word = document.getWordRangeAtPosition(position);
