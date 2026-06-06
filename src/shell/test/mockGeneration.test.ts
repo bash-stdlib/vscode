@@ -9,8 +9,12 @@ suite("generateMockFunctions Logic Test Suite", () => {
       namespace: "",
       description: "A mock for object.",
       args: [{ name: "arg1", type: "string", desc: "Arg for object" }],
-      globals: [{ name: "_object_mock_rc", type: "integer", desc: "RC for object" }],
-      keywords: [{ name: "MOCK_KEYWORD", type: "string", desc: "Keyword for object" }],
+      globals: [
+        { name: "_object_mock_rc", type: "integer", desc: "RC for object" },
+      ],
+      keywords: [
+        { name: "MOCK_KEYWORD", type: "string", desc: "Keyword for object" },
+      ],
       options: [],
       exitcodes: [],
       isTesting: true,
