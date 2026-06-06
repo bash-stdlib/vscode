@@ -15,6 +15,7 @@
 - Prefer well-named variables and functions
 - Use path aliases (`@/test/testHelpers`)
 - Keep helper functions at top of files
+- Quote dynamic shell command arguments and place flags before file paths
 
 ## Process
 
