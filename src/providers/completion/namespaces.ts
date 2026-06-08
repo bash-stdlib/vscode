@@ -22,14 +22,14 @@ export function getNextNamespaceLevels(
   functions: ShdocFunction[],
   currentNamespace: string,
   filter?: string,
-  extraNamespaces: string[] = [],
+  whiteListedNamespaces: string[] = [],
 ): { [key: string]: string } {
   const prefix = currentNamespace ? currentNamespace + "." : "";
   const levels: { [key: string]: string } = {};
 
   const allNamespaces = [
     ...functions.map((fn) => fn.namespace || ""),
-    ...extraNamespaces,
+    ...whiteListedNamespaces,
   ];
 
   allNamespaces.forEach((fullNamespace) => {

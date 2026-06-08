@@ -112,7 +112,7 @@ Cache saved to .bash_stdlib_cache.json
     assert.strictEqual(diagnostics[0].range.start.line, 0);
   });
 
-  test("then it should include extra namespaces before paths in the command with -a", async () => {
+  test("then it should include white listed namespaces before paths in the command with -a", async () => {
     await runLinter("linter.py", ["success.sh"], "python3", ["extra", "ns"]);
 
     const lastCall = execStub.lastCall;

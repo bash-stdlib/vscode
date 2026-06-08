@@ -229,7 +229,7 @@ suite("Namespace Test Suite", () => {
         });
       });
 
-      suite("when there are extra namespaces", () => {
+      suite("when there are white listed namespaces", () => {
         let nextLevels: { [key: string]: string };
         const functions: ShdocFunction[] = [
           {
@@ -252,7 +252,7 @@ suite("Namespace Test Suite", () => {
             ]);
           });
 
-          test("it should include the extra namespace", () => {
+          test("it should include the white listed namespace", () => {
             assert.ok("custom" in nextLevels);
             assert.strictEqual(nextLevels["custom"], "custom");
           });
@@ -272,7 +272,7 @@ suite("Namespace Test Suite", () => {
             );
           });
 
-          test("it should include the nested extra namespace", () => {
+          test("it should include the nested white listed namespace", () => {
             assert.ok("sub" in nextLevels);
             assert.strictEqual(nextLevels["sub"], "custom.sub");
           });
@@ -286,7 +286,7 @@ suite("Namespace Test Suite", () => {
             ]);
           });
 
-          test("it should return only the matching extra namespace", () => {
+          test("it should return only the matching white listed namespace", () => {
             assert.strictEqual(Object.keys(nextLevels).length, 1);
             assert.ok("custom" in nextLevels);
           });

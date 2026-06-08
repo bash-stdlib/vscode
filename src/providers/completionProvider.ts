@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { CONFIG_EXTRA_NAMESPACES } from "@/constants";
+import { CONFIG_WHITELISTED_NAMESPACES } from "@/constants";
 import { debug } from "@/debug";
 import {
   createNamespaceCompletionItem,
@@ -40,15 +40,15 @@ export function createCompletionProvider(
       }
 
       const config = vscode.workspace.getConfiguration();
-      const extraNamespaces =
-        config.get<string[]>(CONFIG_EXTRA_NAMESPACES) || [];
+      const whiteListedNamespaces =
+        config.get<string[]>(CONFIG_WHITELISTED_NAMESPACES) || [];
 
       if (!namespace && !endsWithDot) {
         const rootCompletions = createNamespacedCompletions(
           functionsAvailableInContext,
           "",
           undefined,
-          extraNamespaces,
+          whiteListedNamespaces,
         );
         if (rootCompletions.length > 0) {
           return rootCompletions;
@@ -61,7 +61,7 @@ export function createCompletionProvider(
           functionsAvailableInContext,
           "",
           namespace,
-          extraNamespaces,
+          whiteListedNamespaces,
         );
         if (rootCompletions.length > 0) {
           const filterTextStart = position.character - namespace.length;
@@ -82,7 +82,7 @@ export function createCompletionProvider(
         functionsAvailableInContext,
         namespace,
         undefined,
-        extraNamespaces,
+        whiteListedNamespaces,
       );
     },
   };
@@ -92,7 +92,7 @@ export function createNamespacedCompletions(
   functions: ShdocFunction[],
   namespace: string,
   filter?: string,
-  extraNamespaces: string[] = [],
+  whiteListedNamespaces: string[] = [],
 ): vscode.CompletionItem[] {
   const completions: vscode.CompletionItem[] = [];
 
@@ -100,7 +100,7 @@ export function createNamespacedCompletions(
     functions,
     namespace,
     filter,
-    extraNamespaces,
+    whiteListedNamespaces,
   );
   Object.entries(nextLevels).forEach(([level, fullyQualifiedName]) => {
     completions.push(createNamespaceCompletionItem(level, fullyQualifiedName));
