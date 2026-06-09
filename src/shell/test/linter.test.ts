@@ -112,6 +112,24 @@ Cache saved to .bash_stdlib_cache.json
     assert.strictEqual(diagnostics[0].range.start.line, 0);
   });
 
+  test("then it should include white listed namespaces and ignored codes before paths in the command", async () => {
+    await runLinter(
+      "linter.py",
+      ["success.sh"],
+      "python3",
+      ["extra", "ns"],
+      ["SC1090", "SC2034"],
+    );
+
+    const lastCall = execStub.lastCall;
+    const command = lastCall.args[0];
+    assert.ok(
+      command.includes(
+        '-a "extra" -a "ns" -i "SC1090" -i "SC2034" "success.sh"',
+      ),
+    );
+  });
+
   test("then it should handle multiple files", async () => {
     const results = await runLinter(
       "linter.py",

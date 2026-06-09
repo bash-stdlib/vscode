@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { CONFIG_WHITELISTED_NAMESPACES } from "@/constants";
 import { debug } from "@/debug";
 import {
   createNamespaceCompletionItem,
@@ -38,10 +39,16 @@ export function createCompletionProvider(
         return [];
       }
 
+      const config = vscode.workspace.getConfiguration();
+      const whiteListedNamespaces =
+        config.get<string[]>(CONFIG_WHITELISTED_NAMESPACES) || [];
+
       if (!namespace && !endsWithDot) {
         const rootCompletions = createNamespacedCompletions(
           functionsAvailableInContext,
           "",
+          undefined,
+          whiteListedNamespaces,
         );
         if (rootCompletions.length > 0) {
           return rootCompletions;
@@ -54,6 +61,7 @@ export function createCompletionProvider(
           functionsAvailableInContext,
           "",
           namespace,
+          whiteListedNamespaces,
         );
         if (rootCompletions.length > 0) {
           const filterTextStart = position.character - namespace.length;
@@ -73,6 +81,8 @@ export function createCompletionProvider(
       return createNamespacedCompletions(
         functionsAvailableInContext,
         namespace,
+        undefined,
+        whiteListedNamespaces,
       );
     },
   };
@@ -82,10 +92,16 @@ export function createNamespacedCompletions(
   functions: ShdocFunction[],
   namespace: string,
   filter?: string,
+  whiteListedNamespaces: string[] = [],
 ): vscode.CompletionItem[] {
   const completions: vscode.CompletionItem[] = [];
 
-  const nextLevels = getNextNamespaceLevels(functions, namespace, filter);
+  const nextLevels = getNextNamespaceLevels(
+    functions,
+    namespace,
+    filter,
+    whiteListedNamespaces,
+  );
   Object.entries(nextLevels).forEach(([level, fullyQualifiedName]) => {
     completions.push(createNamespaceCompletionItem(level, fullyQualifiedName));
   });
