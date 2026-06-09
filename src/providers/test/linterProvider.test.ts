@@ -36,8 +36,8 @@ suite("LinterProvider Test Suite", () => {
       configStub.get
         .withArgs(CONFIG_WHITELISTED_NAMESPACES, [])
         .returns(["extra"]);
-      configStub
-        .get.withArgs("bash-stdlib.linter.ignoredCodes", [])
+      configStub.get
+        .withArgs("bash-stdlib.linter.ignoredCodes", [])
         .returns(["SC1090"]);
 
       sandbox
