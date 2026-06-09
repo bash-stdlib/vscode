@@ -53,6 +53,14 @@
           "default": 500,
           "description": "The interval (in milliseconds) at which to run the linter while editing."
         },
+        "bash-stdlib.linter.ignoredCodes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "A list of linter error codes to ignore."
+        },
         "bash-stdlib.whiteListedNamespaces": {
           "type": "array",
           "items": {

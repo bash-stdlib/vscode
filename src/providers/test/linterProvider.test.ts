@@ -36,6 +36,9 @@ suite("LinterProvider Test Suite", () => {
       configStub.get
         .withArgs(CONFIG_WHITELISTED_NAMESPACES, [])
         .returns(["extra"]);
+      configStub
+        .get.withArgs("bash-stdlib.linter.ignoredCodes", [])
+        .returns(["SC1090"]);
 
       sandbox
         .stub(vscode.workspace, "getConfiguration")
@@ -44,10 +47,11 @@ suite("LinterProvider Test Suite", () => {
       await (linterProvider as any).runLinterForFiles([filePath]);
     });
 
-    test("it should pass white listed namespaces to runLinter", () => {
+    test("it should pass white listed namespaces and ignored codes to runLinter", () => {
       assert.ok(runLinterStub.calledOnce);
       const args = runLinterStub.lastCall.args;
       assert.deepStrictEqual(args[3], ["extra"]);
+      assert.deepStrictEqual(args[4], ["SC1090"]);
     });
   });
 });

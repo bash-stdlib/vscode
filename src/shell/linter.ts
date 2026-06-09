@@ -17,6 +17,7 @@ export async function runLinter(
   filePaths: string[],
   pythonPath: string = "python3",
   whiteListedNamespaces: string[] = [],
+  ignoredCodes: string[] = [],
 ): Promise<LinterResult[]> {
   if (!executablePath || filePaths.length === 0) {
     return [];
@@ -25,12 +26,13 @@ export async function runLinter(
   const quotedPaths = filePaths.map((p) => `"${p}"`).join(" ");
   let command = `"${pythonPath}" "${executablePath}" check --format vscode`;
 
-  if (whiteListedNamespaces.length > 0) {
-    const quotedNamespaces = whiteListedNamespaces
-      .map((ns) => `"${ns}"`)
-      .join(" ");
-    command += ` -a ${quotedNamespaces}`;
-  }
+  whiteListedNamespaces.forEach((ns) => {
+    command += ` -a "${ns}"`;
+  });
+
+  ignoredCodes.forEach((code) => {
+    command += ` -i "${code}"`;
+  });
 
   command += ` ${quotedPaths}`;
 
