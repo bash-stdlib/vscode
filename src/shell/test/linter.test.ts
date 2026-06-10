@@ -83,6 +83,22 @@ suite("when the linter is executed", () => {
 Cache saved to .bash_stdlib_cache.json
 `;
         return { stdout: output, stderr: "" };
+      } else if (command.includes("shellcheck_format.sh")) {
+        const output = JSON.stringify({
+          comments: [
+            {
+              file: "shellcheck_format.sh",
+              line: 1,
+              endLine: 1,
+              column: 1,
+              endColumn: 5,
+              level: "warning",
+              code: 2034,
+              message: "unused variable",
+            },
+          ],
+        });
+        return { stdout: output, stderr: "" };
       }
       return { stdout: "", stderr: "" };
     });
@@ -160,5 +176,49 @@ Cache saved to .bash_stdlib_cache.json
     assert.strictEqual(diagnostics.length, 1);
     assert.strictEqual(diagnostics[0].message, "Mixed output error");
     assert.strictEqual(diagnostics[0].range.start.line, 1);
+  });
+
+  test("then it should parse shellcheck format correctly", async () => {
+    const results = await runLinter(
+      "linter.py",
+      ["shellcheck_format.sh"],
+      "python3",
+    );
+    assert.strictEqual(results.length, 1);
+    const diagnostics = results[0].diagnostics;
+    assert.strictEqual(diagnostics.length, 1);
+    assert.strictEqual(diagnostics[0].message, "unused variable");
+    assert.strictEqual(diagnostics[0].code, 2034);
+    assert.strictEqual(diagnostics[0].range.start.line, 0); // 1-based to 0-based
+  });
+
+  test("then it should suppress SC2034 for framework variables", async () => {
+    execStub.callsFake(async () => {
+      const output = JSON.stringify([
+        {
+          file: "suppress.sh",
+          line: 1,
+          column: 1,
+          level: "warning",
+          code: 2034,
+          message: "parametrize_configuration appears unused.",
+        },
+        {
+          file: "suppress.sh",
+          line: 2,
+          column: 1,
+          level: "warning",
+          code: 2034,
+          message: "my_custom_var appears unused.",
+        },
+      ]);
+      return { stdout: output, stderr: "" };
+    });
+
+    const results = await runLinter("linter.py", ["suppress.sh"], "python3");
+    assert.strictEqual(results.length, 1);
+    const diagnostics = results[0].diagnostics;
+    assert.strictEqual(diagnostics.length, 1);
+    assert.strictEqual(diagnostics[0].message, "my_custom_var appears unused.");
   });
 });

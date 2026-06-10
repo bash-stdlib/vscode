@@ -53,6 +53,21 @@ export async function runLinter(
   }
 }
 
+const SUPPRESSED_SC2034_VARS = [
+  "parametrize_configuration",
+  "parametrize_configuration_index",
+  "parametrize_configuration_line",
+  "parametrize_configuration_scenario_start_index",
+  "test_function_variant_name",
+  "test_function_variant_padding_value",
+  "PARAMETRIZE_SCENARIO_NAME",
+  "setting_debug_boolean",
+  "setting_field_separator_char",
+  "setting_fixture_command_prefix",
+  "setting_original_test_names_boolean",
+  "setting_variant_tag",
+];
+
 function parseLinterOutput(
   output: string,
   filePaths: string[],
@@ -66,23 +81,46 @@ function parseLinterOutput(
     }
 
     const jsonStr = output.substring(startIndex, endIndex + 1);
-    const diagnosticsData = JSON.parse(jsonStr);
+    const rawData = JSON.parse(jsonStr);
+    const diagnosticsData = Array.isArray(rawData) ? rawData : rawData.comments;
+
+    if (!Array.isArray(diagnosticsData)) {
+      return [];
+    }
 
     const resultsMap = new Map<string, vscode.Diagnostic[]>();
     filePaths.forEach((path) => resultsMap.set(path, []));
 
     diagnosticsData.forEach((data: any) => {
-      const range = new vscode.Range(
-        data.range.start.line,
-        data.range.start.character,
-        data.range.end.line,
-        data.range.end.character,
-      );
+      if (data.code === 2034 || data.code === "SC2034") {
+        const isSuppressed = SUPPRESSED_SC2034_VARS.some((v) =>
+          data.message.includes(v),
+        );
+        if (isSuppressed) {
+          return;
+        }
+      }
+
+      let range: vscode.Range;
+      if (data.range) {
+        range = new vscode.Range(
+          data.range.start.line,
+          data.range.start.character,
+          data.range.end.line,
+          data.range.end.character,
+        );
+      } else {
+        const line = (data.line ?? 1) - 1;
+        const column = (data.column ?? 1) - 1;
+        const endLine = (data.endLine ?? data.line ?? 1) - 1;
+        const endColumn = (data.endColumn ?? data.column ?? 1) - 1;
+        range = new vscode.Range(line, column, endLine, endColumn);
+      }
 
       const diagnostic = new vscode.Diagnostic(
         range,
         data.message,
-        data.severity === 1
+        data.severity === 1 || data.level === "error"
           ? vscode.DiagnosticSeverity.Error
           : vscode.DiagnosticSeverity.Warning,
       );
