@@ -1,12 +1,18 @@
 import * as sinon from "sinon";
 import * as vscode from "vscode";
 import * as assert from "assert";
+import * as fs from "fs";
+import * as path from "path";
 import { runLinter, linterProcess, LinterResult } from "@/shell/linter";
 
 suite("when the linter is executed", () => {
   let execStub: sinon.SinonStub;
+  let responses: Record<string, { stdout: string; stderr: string }>;
 
   setup(() => {
+    const assetsPath = path.join(__dirname, "assets/linter-responses.json");
+    responses = JSON.parse(fs.readFileSync(assetsPath, "utf8"));
+
     execStub = sinon.stub(linterProcess, "exec");
 
     execStub.callsFake(async (command: string) => {
@@ -15,75 +21,16 @@ suite("when the linter is executed", () => {
           `Expected command to start with pythonPath, but got: ${command}`,
         );
       }
-      if (command.includes("success.sh")) {
-        return { stdout: "[]", stderr: "" };
-      } else if (
-        command.includes("error.sh") &&
-        !command.includes("error2.sh")
-      ) {
-        const output = JSON.stringify([
-          {
-            range: {
-              start: { line: 0, character: 0 },
-              end: { line: 0, character: 5 },
-            },
-            severity: 1,
-            code: "STD001",
-            source: "bash-stdlib-lint",
-            message: "Test error message",
-            file: "error.sh",
-          },
-        ]);
-        return { stdout: output, stderr: "" };
-      } else if (
-        command.includes("error.sh") &&
-        command.includes("error2.sh")
-      ) {
-        const output = JSON.stringify([
-          {
-            range: {
-              start: { line: 0, character: 0 },
-              end: { line: 0, character: 5 },
-            },
-            severity: 1,
-            code: "STD001",
-            source: "bash-stdlib-lint",
-            message: "Error in file 1",
-            file: "error.sh",
-          },
-          {
-            range: {
-              start: { line: 1, character: 0 },
-              end: { line: 1, character: 5 },
-            },
-            severity: 1,
-            code: "STD002",
-            source: "bash-stdlib-lint",
-            message: "Error in file 2",
-            file: "error2.sh",
-          },
-        ]);
-        return { stdout: output, stderr: "" };
-      } else if (command.includes("mixed_output.sh")) {
-        const output = `
- Fetching documentation to build cache...
-[
-    {
-        "range": {
-            "start": { "line": 1, "character": 2 },
-            "end": { "line": 1, "character": 10 }
-        },
-        "severity": 1,
-        "code": "STD002",
-        "source": "bash-stdlib-lint",
-        "message": "Mixed output error",
-        "file": "mixed_output.sh"
-    }
-]
-Cache saved to .bash_stdlib_cache.json
-`;
-        return { stdout: output, stderr: "" };
+
+      const matchedKey = Object.keys(responses).find((key) => {
+        const parts = key.split("+");
+        return parts.every((p) => command.includes(p));
+      });
+
+      if (matchedKey) {
+        return responses[matchedKey];
       }
+
       return { stdout: "", stderr: "" };
     });
   });
