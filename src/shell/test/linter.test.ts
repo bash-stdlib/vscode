@@ -1,7 +1,7 @@
 import * as sinon from "sinon";
 import * as vscode from "vscode";
 import * as assert from "assert";
-import { runLinter, linterProcess } from "@/shell/linter";
+import { runLinter, linterProcess, LinterResult } from "@/shell/linter";
 
 suite("when the linter is executed", () => {
   let execStub: sinon.SinonStub;
@@ -92,96 +92,162 @@ Cache saved to .bash_stdlib_cache.json
     execStub.restore();
   });
 
-  test("then it should return an empty array for no errors", async () => {
-    const results = await runLinter("linter.py", ["success.sh"], "python3");
-    assert.strictEqual(results.length, 1);
-    assert.strictEqual(results[0].diagnostics.length, 0);
+  suite("given no errors are returned", () => {
+    let results: LinterResult[];
+
+    setup(async () => {
+      results = await runLinter("linter.py", ["success.sh"], "python3");
+    });
+
+    test("then it should return results for one file", () => {
+      assert.strictEqual(results.length, 1);
+    });
+
+    test("then it should return an empty array of diagnostics", () => {
+      assert.strictEqual(results[0].diagnostics.length, 0);
+    });
   });
 
-  test("then it should parse errors correctly", async () => {
-    const results = await runLinter("linter.py", ["error.sh"], "python3");
-    assert.strictEqual(results.length, 1);
-    const diagnostics = results[0].diagnostics;
-    assert.strictEqual(diagnostics.length, 1);
-    assert.strictEqual(diagnostics[0].message, "Test error message");
-    assert.strictEqual(diagnostics[0].code, "STD001");
-    assert.strictEqual(
-      diagnostics[0].severity,
-      vscode.DiagnosticSeverity.Error,
-    );
-    assert.strictEqual(diagnostics[0].range.start.line, 0);
+  suite("given errors are returned", () => {
+    let results: LinterResult[];
+
+    setup(async () => {
+      results = await runLinter("linter.py", ["error.sh"], "python3");
+    });
+
+    test("then it should return results for one file", () => {
+      assert.strictEqual(results.length, 1);
+    });
+
+    test("then it should parse the error message correctly", () => {
+      assert.strictEqual(results[0].diagnostics[0].message, "Test error message");
+    });
+
+    test("then it should parse the error code correctly", () => {
+      assert.strictEqual(results[0].diagnostics[0].code, "STD001");
+    });
+
+    test("then it should parse the severity correctly", () => {
+      assert.strictEqual(
+        results[0].diagnostics[0].severity,
+        vscode.DiagnosticSeverity.Error,
+      );
+    });
+
+    test("then it should parse the line number correctly", () => {
+      assert.strictEqual(results[0].diagnostics[0].range.start.line, 0);
+    });
   });
 
-  test("then it should include multiple namespaces in the command", async () => {
-    await runLinter("linter.py", ["success.sh"], "python3", ["ns1", "ns2"]);
+  suite("given multiple namespaces", () => {
+    let command: string;
 
-    const lastCall = execStub.lastCall;
-    const command = lastCall.args[0];
-    assert.ok(command.includes('-ns "ns1" -ns "ns2" "success.sh"'));
+    setup(async () => {
+      await runLinter("linter.py", ["success.sh"], "python3", ["ns1", "ns2"]);
+      command = execStub.lastCall.args[0];
+    });
+
+    test("then it should include both namespaces with -ns flags", () => {
+      assert.ok(command.includes('-ns "ns1" -ns "ns2" "success.sh"'));
+    });
   });
 
-  test("then it should include multiple functions in the command", async () => {
-    await runLinter(
-      "linter.py",
-      ["success.sh"],
-      "python3",
-      [],
-      ["func1", "func2"],
-    );
+  suite("given multiple functions", () => {
+    let command: string;
 
-    const lastCall = execStub.lastCall;
-    const command = lastCall.args[0];
-    assert.ok(command.includes('-fn "func1" -fn "func2" "success.sh"'));
+    setup(async () => {
+      await runLinter(
+        "linter.py",
+        ["success.sh"],
+        "python3",
+        [],
+        ["func1", "func2"],
+      );
+      command = execStub.lastCall.args[0];
+    });
+
+    test("then it should include both functions with -fn flags", () => {
+      assert.ok(command.includes('-fn "func1" -fn "func2" "success.sh"'));
+    });
   });
 
-  test("then it should include extra namespaces, extra functions and ignored codes before paths in the command", async () => {
-    await runLinter(
-      "linter.py",
-      ["success.sh"],
-      "python3",
-      ["extra", "ns"],
-      ["func1", "func2"],
-      ["SC1090", "SC2034"],
-    );
+  suite("given extra namespaces, functions and ignored codes", () => {
+    let command: string;
 
-    const lastCall = execStub.lastCall;
-    const command = lastCall.args[0];
-    assert.ok(
-      command.includes(
-        '-ns "extra" -ns "ns" -fn "func1" -fn "func2" -i "SC1090" -i "SC2034" "success.sh"',
-      ),
-    );
+    setup(async () => {
+      await runLinter(
+        "linter.py",
+        ["success.sh"],
+        "python3",
+        ["extra", "ns"],
+        ["func1", "func2"],
+        ["SC1090", "SC2034"],
+      );
+      command = execStub.lastCall.args[0];
+    });
+
+    test("then it should include all flags in the command", () => {
+      assert.ok(
+        command.includes(
+          '-ns "extra" -ns "ns" -fn "func1" -fn "func2" -i "SC1090" -i "SC2034" "success.sh"',
+        ),
+      );
+    });
   });
 
-  test("then it should handle multiple files", async () => {
-    const results = await runLinter(
-      "linter.py",
-      ["error.sh", "error2.sh"],
-      "python3",
-    );
-    assert.strictEqual(results.length, 2);
+  suite("given multiple files", () => {
+    let results: LinterResult[];
+    let resultsMap: Map<string, LinterResult>;
 
-    const res1 = results.find((r) => r.filePath === "error.sh");
-    const res2 = results.find((r) => r.filePath === "error2.sh");
+    setup(async () => {
+      results = await runLinter(
+        "linter.py",
+        ["error.sh", "error2.sh"],
+        "python3",
+      );
+      resultsMap = new Map(results.map((r) => [r.filePath, r]));
+    });
 
-    assert.ok(res1);
-    assert.ok(res2);
-    assert.strictEqual(res1!.diagnostics.length, 1);
-    assert.strictEqual(res1!.diagnostics[0].message, "Error in file 1");
-    assert.strictEqual(res2!.diagnostics.length, 1);
-    assert.strictEqual(res2!.diagnostics[0].message, "Error in file 2");
+    test("then it should return results for all files", () => {
+      assert.strictEqual(results.length, 2);
+    });
+
+    test("then it should contain diagnostics for the first file", () => {
+      const result = resultsMap.get("error.sh");
+      assert.ok(result);
+      assert.strictEqual(result!.diagnostics.length, 1);
+      assert.strictEqual(result!.diagnostics[0].message, "Error in file 1");
+    });
+
+    test("then it should contain diagnostics for the second file", () => {
+      const result = resultsMap.get("error2.sh");
+      assert.ok(result);
+      assert.strictEqual(result!.diagnostics.length, 1);
+      assert.strictEqual(result!.diagnostics[0].message, "Error in file 2");
+    });
   });
 
-  test("then it should handle mixed output with extra text", async () => {
-    const results = await runLinter(
-      "linter.py",
-      ["mixed_output.sh"],
-      "python3",
-    );
-    assert.strictEqual(results.length, 1);
-    const diagnostics = results[0].diagnostics;
-    assert.strictEqual(diagnostics.length, 1);
-    assert.strictEqual(diagnostics[0].message, "Mixed output error");
-    assert.strictEqual(diagnostics[0].range.start.line, 1);
+  suite("given mixed output with extra text", () => {
+    let results: LinterResult[];
+
+    setup(async () => {
+      results = await runLinter(
+        "linter.py",
+        ["mixed_output.sh"],
+        "python3",
+      );
+    });
+
+    test("then it should return results for one file", () => {
+      assert.strictEqual(results.length, 1);
+    });
+
+    test("then it should parse the diagnostic message correctly", () => {
+      assert.strictEqual(results[0].diagnostics[0].message, "Mixed output error");
+    });
+
+    test("then it should parse the line number correctly", () => {
+      assert.strictEqual(results[0].diagnostics[0].range.start.line, 1);
+    });
   });
 });
