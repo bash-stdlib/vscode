@@ -1,5 +1,7 @@
-export const CONFIG_WHITELISTED_NAMESPACES =
-  "bash-stdlib.whiteListedNamespaces";
+export const CONFIG_LINTER_EXTRA_FUNCTIONS =
+  "bash-stdlib.linter.extraFunctions";
+export const CONFIG_LINTER_EXTRA_NAMESPACES =
+  "bash-stdlib.linter.extraNamespaces";
 export const CONFIG_LINTER_ENABLED = "bash-stdlib.linter.enabled";
 export const CONFIG_LINTER_EXECUTABLE_PATH =
   "bash-stdlib.linter.executablePath";

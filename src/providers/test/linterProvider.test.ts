@@ -1,7 +1,10 @@
 import * as sinon from "sinon";
 import * as vscode from "vscode";
 import * as assert from "assert";
-import { CONFIG_WHITELISTED_NAMESPACES } from "@/constants";
+import {
+  CONFIG_LINTER_EXTRA_FUNCTIONS,
+  CONFIG_LINTER_EXTRA_NAMESPACES,
+} from "@/constants";
 import { LinterProvider } from "@/providers/linterProvider";
 import * as linterModule from "@/shell/linter";
 
@@ -21,7 +24,7 @@ suite("LinterProvider Test Suite", () => {
     linterProvider.dispose();
   });
 
-  suite("when running linter for files with white listed namespaces", () => {
+  suite("when running linter for files with extra configurations", () => {
     const filePath = "/path/to/file.sh";
 
     setup(async () => {
@@ -34,8 +37,11 @@ suite("LinterProvider Test Suite", () => {
         .withArgs("bash-stdlib.linter.executablePath", "")
         .returns("main.py");
       configStub.get
-        .withArgs(CONFIG_WHITELISTED_NAMESPACES, [])
+        .withArgs(CONFIG_LINTER_EXTRA_NAMESPACES, [])
         .returns(["extra"]);
+      configStub.get
+        .withArgs(CONFIG_LINTER_EXTRA_FUNCTIONS, [])
+        .returns(["extraFunc"]);
       configStub.get
         .withArgs("bash-stdlib.linter.ignoredCodes", [])
         .returns(["SC1090"]);
@@ -47,11 +53,12 @@ suite("LinterProvider Test Suite", () => {
       await (linterProvider as any).runLinterForFiles([filePath]);
     });
 
-    test("it should pass white listed namespaces and ignored codes to runLinter", () => {
+    test("it should pass extra namespaces, extra functions and ignored codes to runLinter", () => {
       assert.ok(runLinterStub.calledOnce);
       const args = runLinterStub.lastCall.args;
       assert.deepStrictEqual(args[3], ["extra"]);
-      assert.deepStrictEqual(args[4], ["SC1090"]);
+      assert.deepStrictEqual(args[4], ["extraFunc"]);
+      assert.deepStrictEqual(args[5], ["SC1090"]);
     });
   });
 });

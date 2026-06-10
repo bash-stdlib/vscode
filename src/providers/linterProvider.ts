@@ -2,10 +2,11 @@ import * as vscode from "vscode";
 import {
   CONFIG_LINTER_ENABLED,
   CONFIG_LINTER_EXECUTABLE_PATH,
+  CONFIG_LINTER_EXTRA_FUNCTIONS,
+  CONFIG_LINTER_EXTRA_NAMESPACES,
   CONFIG_LINTER_IGNORED_CODES,
   CONFIG_LINTER_INTERVAL,
   CONFIG_LINTER_PYTHON_PATH,
-  CONFIG_WHITELISTED_NAMESPACES,
   LINTER_SOURCE,
 } from "@/constants";
 import { runLinter } from "@/shell/linter";
@@ -28,7 +29,8 @@ export class LinterProvider {
           e.affectsConfiguration(CONFIG_LINTER_EXECUTABLE_PATH) ||
           e.affectsConfiguration(CONFIG_LINTER_PYTHON_PATH) ||
           e.affectsConfiguration(CONFIG_LINTER_INTERVAL) ||
-          e.affectsConfiguration(CONFIG_WHITELISTED_NAMESPACES) ||
+          e.affectsConfiguration(CONFIG_LINTER_EXTRA_NAMESPACES) ||
+          e.affectsConfiguration(CONFIG_LINTER_EXTRA_FUNCTIONS) ||
           e.affectsConfiguration(CONFIG_LINTER_IGNORED_CODES)
         ) {
           this.doBatchLint();
@@ -135,8 +137,12 @@ export class LinterProvider {
       return;
     }
 
-    const whiteListedNamespaces = config.get<string[]>(
-      CONFIG_WHITELISTED_NAMESPACES,
+    const extraNamespaces = config.get<string[]>(
+      CONFIG_LINTER_EXTRA_NAMESPACES,
+      [],
+    );
+    const extraFunctions = config.get<string[]>(
+      CONFIG_LINTER_EXTRA_FUNCTIONS,
       [],
     );
     const ignoredCodes = config.get<string[]>(CONFIG_LINTER_IGNORED_CODES, []);
@@ -144,7 +150,8 @@ export class LinterProvider {
       executablePath,
       filePaths,
       pythonPath,
-      whiteListedNamespaces,
+      extraNamespaces,
+      extraFunctions,
       ignoredCodes,
     );
 

@@ -61,13 +61,21 @@
           "default": [],
           "description": "A list of linter error codes to ignore."
         },
-        "bash-stdlib.whiteListedNamespaces": {
+        "bash-stdlib.linter.extraNamespaces": {
           "type": "array",
           "items": {
             "type": "string"
           },
           "default": [],
-          "description": "Extra namespaces to inject. Used for development purposes."
+          "description": "Extra namespaces to whitelist in the linter. Any function in these namespaces will be whitelisted."
+        },
+        "bash-stdlib.linter.extraFunctions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Extra full function names to whitelist in the linter."
         }
       }
     },

@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { CONFIG_WHITELISTED_NAMESPACES } from "@/constants";
+import { CONFIG_LINTER_EXTRA_NAMESPACES } from "@/constants";
 import { debug } from "@/debug";
 import {
   createNamespaceCompletionItem,
@@ -41,7 +41,7 @@ export function createCompletionProvider(
 
       const config = vscode.workspace.getConfiguration();
       const whiteListedNamespaces =
-        config.get<string[]>(CONFIG_WHITELISTED_NAMESPACES) || [];
+        config.get<string[]>(CONFIG_LINTER_EXTRA_NAMESPACES) || [];
 
       if (!namespace && !endsWithDot) {
         const rootCompletions = createNamespacedCompletions(
