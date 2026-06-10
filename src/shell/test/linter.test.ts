@@ -120,7 +120,10 @@ Cache saved to .bash_stdlib_cache.json
     });
 
     test("then it should parse the error message correctly", () => {
-      assert.strictEqual(results[0].diagnostics[0].message, "Test error message");
+      assert.strictEqual(
+        results[0].diagnostics[0].message,
+        "Test error message",
+      );
     });
 
     test("then it should parse the error code correctly", () => {
@@ -231,11 +234,7 @@ Cache saved to .bash_stdlib_cache.json
     let results: LinterResult[];
 
     setup(async () => {
-      results = await runLinter(
-        "linter.py",
-        ["mixed_output.sh"],
-        "python3",
-      );
+      results = await runLinter("linter.py", ["mixed_output.sh"], "python3");
     });
 
     test("then it should return results for one file", () => {
@@ -243,7 +242,10 @@ Cache saved to .bash_stdlib_cache.json
     });
 
     test("then it should parse the diagnostic message correctly", () => {
-      assert.strictEqual(results[0].diagnostics[0].message, "Mixed output error");
+      assert.strictEqual(
+        results[0].diagnostics[0].message,
+        "Mixed output error",
+      );
     });
 
     test("then it should parse the line number correctly", () => {
