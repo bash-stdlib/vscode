@@ -28,11 +28,11 @@ export async function runLinter(
   let command = `"${pythonPath}" "${executablePath}" check --format vscode`;
 
   extraNamespaces.forEach((ns) => {
-    command += ` -n "${ns}"`;
+    command += ` -ns "${ns}"`;
   });
 
   extraFunctions.forEach((fn) => {
-    command += ` -f "${fn}"`;
+    command += ` -fn "${fn}"`;
   });
 
   ignoredCodes.forEach((code) => {

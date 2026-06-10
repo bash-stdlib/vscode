@@ -126,7 +126,7 @@ Cache saved to .bash_stdlib_cache.json
     const command = lastCall.args[0];
     assert.ok(
       command.includes(
-        '-n "extra" -n "ns" -f "func1" -f "func2" -i "SC1090" -i "SC2034" "success.sh"',
+        '-ns "extra" -ns "ns" -fn "func1" -fn "func2" -i "SC1090" -i "SC2034" "success.sh"',
       ),
     );
   });
