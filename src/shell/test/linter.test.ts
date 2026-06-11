@@ -7,7 +7,7 @@ import { runLinter, linterProcess, LinterResult } from "@/shell/linter";
 
 suite("when the linter is executed", () => {
   let execStub: sinon.SinonStub;
-  let responses: Record<string, { stdout: string; stderr: string }>;
+  let responses: Record<string, { stdout: any; stderr: string }>;
 
   setup(() => {
     const assetsPath = path.join(__dirname, "assets/linter-responses.json");
@@ -28,7 +28,14 @@ suite("when the linter is executed", () => {
       });
 
       if (matchedKey) {
-        return responses[matchedKey];
+        const response = responses[matchedKey];
+        return {
+          stdout:
+            typeof response.stdout === "string"
+              ? response.stdout
+              : JSON.stringify(response.stdout),
+          stderr: response.stderr,
+        };
       }
 
       return { stdout: "", stderr: "" };
