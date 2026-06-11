@@ -4,10 +4,13 @@
 
 - **Arrange & Act** in `setup()` blocks (create data, execute code)
 - **Assert** only in tests (single, focused assertions with no messages)
+- Organize scenarios into **nested sub-suites** using `suite()`
+- One assertion per `test()` block for maximum granularity and readability
+- Separate Arrange from Act with a **blank line** within `setup()` for clarity
 - Use object parameters for helpers: `{ content, line, character }`
 - Consistent variable names throughout file (never mix `doc` and `document`)
 - Only setup shared test data (remove unused setup)
-- No comments in tests — let names explain intent
+- No comments in tests — let names (suite, test, variables) explain intent
 
 ## Code Style
 
