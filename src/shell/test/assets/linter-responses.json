@@ -1,5 +1,6 @@
-{
-  "error.sh+error2.sh": {
+[
+  {
+    "pattern": ["error.sh", "error2.sh"],
     "stdout": [
       {
         "range": {
@@ -26,11 +27,13 @@
     ],
     "stderr": ""
   },
-  "success.sh": {
+  {
+    "pattern": ["success.sh"],
     "stdout": [],
     "stderr": ""
   },
-  "error.sh": {
+  {
+    "pattern": ["error.sh"],
     "stdout": [
       {
         "range": {
@@ -46,8 +49,9 @@
     ],
     "stderr": ""
   },
-  "mixed_output.sh": {
+  {
+    "pattern": ["mixed_output.sh"],
     "stdout": "\n Fetching documentation to build cache...\n[\n    {\n        \"range\": {\n            \"start\": { \"line\": 1, \"character\": 2 },\n            \"end\": { \"line\": 1, \"character\": 10 }\n        },\n        \"severity\": 1,\n        \"code\": \"STD002\",\n        \"source\": \"bash-stdlib-lint\",\n        \"message\": \"Mixed output error\",\n        \"file\": \"mixed_output.sh\"\n    }\n]\nCache saved to .bash_stdlib_cache.json\n",
     "stderr": ""
   }
-}
+]

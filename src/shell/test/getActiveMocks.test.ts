@@ -40,6 +40,7 @@ suite("getActiveMocks", () => {
       const content = "echo hello";
       const document = createMockDocument(content);
       const position = new vscode.Position(0, 10);
+
       activeMocks = getActiveMocks(document, position);
     });
 
@@ -55,6 +56,7 @@ suite("getActiveMocks", () => {
       const content = "_mock.create example\n";
       const document = createMockDocument(content);
       const position = new vscode.Position(1, 0);
+
       activeMocks = getActiveMocks(document, position);
     });
 
@@ -70,6 +72,7 @@ suite("getActiveMocks", () => {
       const content = "_mock.create example1\n_mock.create example2\n";
       const document = createMockDocument(content);
       const position = new vscode.Position(2, 0);
+
       activeMocks = getActiveMocks(document, position);
     });
 
@@ -85,6 +88,7 @@ suite("getActiveMocks", () => {
       const content = "_mock.create example\n_mock.delete example\n";
       const document = createMockDocument(content);
       const position = new vscode.Position(2, 0);
+
       activeMocks = getActiveMocks(document, position);
     });
 
@@ -101,6 +105,7 @@ suite("getActiveMocks", () => {
         "_mock.create example1\n_mock.create example2\n_mock.delete example1\n";
       const document = createMockDocument(content);
       const position = new vscode.Position(3, 0);
+
       activeMocks = getActiveMocks(document, position);
     });
 
@@ -116,6 +121,7 @@ suite("getActiveMocks", () => {
       const content = "echo hello\n_mock.create example\n";
       const document = createMockDocument(content);
       const position = new vscode.Position(0, 10);
+
       activeMocks = getActiveMocks(document, position);
     });
 
@@ -131,6 +137,7 @@ suite("getActiveMocks", () => {
       const content = "_mock.create example\n\n_mock.delete example\n";
       const document = createMockDocument(content);
       const position = new vscode.Position(1, 0);
+
       activeMocks = getActiveMocks(document, position);
     });
 
@@ -146,6 +153,7 @@ suite("getActiveMocks", () => {
       const content = "# _mock.create example\n";
       const document = createMockDocument(content);
       const position = new vscode.Position(1, 0);
+
       activeMocks = getActiveMocks(document, position);
     });
 
@@ -161,6 +169,7 @@ suite("getActiveMocks", () => {
       const content = "_mock.create example # this is a comment\n";
       const document = createMockDocument(content);
       const position = new vscode.Position(1, 0);
+
       activeMocks = getActiveMocks(document, position);
     });
 
