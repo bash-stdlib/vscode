@@ -32,7 +32,10 @@ suite("Hover Provider Test Suite", () => {
       let result: string | null;
 
       setup(() => {
-        result = extractFullIdentifier("result=$(stdlib.array.is_empty arr)", 15);
+        result = extractFullIdentifier(
+          "result=$(stdlib.array.is_empty arr)",
+          15,
+        );
       });
 
       test("should extract identifier", () => {
@@ -44,7 +47,10 @@ suite("Hover Provider Test Suite", () => {
       let result: string | null;
 
       setup(() => {
-        result = extractFullIdentifier("if stdlib.array.is_empty arr; then", 23);
+        result = extractFullIdentifier(
+          "if stdlib.array.is_empty arr; then",
+          23,
+        );
       });
 
       test("should extract identifier", () => {
