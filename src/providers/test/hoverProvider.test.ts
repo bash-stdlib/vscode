@@ -4,106 +4,50 @@ import { ShdocFunction } from "@/shell/shdoc";
 
 suite("Hover Provider Test Suite", () => {
   suite("extractFullIdentifier", () => {
-    suite("when identifier is simple", () => {
-      let result: string | null;
-
-      setup(() => {
-        result = extractFullIdentifier("is_empty", 8);
-      });
-
-      test("should extract simple function name", () => {
-        assert.strictEqual(result, "is_empty");
-      });
+    test("should extract simple function name", () => {
+      const result = extractFullIdentifier("is_empty", 8);
+      assert.strictEqual(result, "is_empty");
     });
 
-    suite("when identifier is namespaced", () => {
-      let result: string | null;
-
-      setup(() => {
-        result = extractFullIdentifier("stdlib.array.is_empty", 21);
-      });
-
-      test("should extract namespaced function name", () => {
-        assert.strictEqual(result, "stdlib.array.is_empty");
-      });
+    test("should extract namespaced function name", () => {
+      const result = extractFullIdentifier("stdlib.array.is_empty", 21);
+      assert.strictEqual(result, "stdlib.array.is_empty");
     });
 
-    suite("when identifier is in middle of line", () => {
-      let result: string | null;
-
-      setup(() => {
-        result = extractFullIdentifier(
-          "result=$(stdlib.array.is_empty arr)",
-          15,
-        );
-      });
-
-      test("should extract identifier", () => {
-        assert.strictEqual(result, "stdlib.array.is_empty");
-      });
+    test("should extract identifier from middle of line", () => {
+      const result = extractFullIdentifier(
+        "result=$(stdlib.array.is_empty arr)",
+        15,
+      );
+      assert.strictEqual(result, "stdlib.array.is_empty");
     });
 
-    suite("when identifier is at end of line", () => {
-      let result: string | null;
-
-      setup(() => {
-        result = extractFullIdentifier(
-          "if stdlib.array.is_empty arr; then",
-          23,
-        );
-      });
-
-      test("should extract identifier", () => {
-        assert.strictEqual(result, "stdlib.array.is_empty");
-      });
+    test("should extract identifier at end of line", () => {
+      const result = extractFullIdentifier(
+        "if stdlib.array.is_empty arr; then",
+        23,
+      );
+      assert.strictEqual(result, "stdlib.array.is_empty");
     });
 
-    suite("when position is at start of line", () => {
-      let result: string | null;
-
-      setup(() => {
-        result = extractFullIdentifier("stdlib.array.is_empty", 0);
-      });
-
-      test("should extract identifier", () => {
-        assert.strictEqual(result, "stdlib.array.is_empty");
-      });
+    test("should extract identifier at start of line", () => {
+      const result = extractFullIdentifier("stdlib.array.is_empty", 0);
+      assert.strictEqual(result, "stdlib.array.is_empty");
     });
 
-    suite("when identifier is followed by non-word character", () => {
-      let result: string | null;
-
-      setup(() => {
-        result = extractFullIdentifier("stdlib.array.is_empty(", 18);
-      });
-
-      test("should stop at non-word characters", () => {
-        assert.strictEqual(result, "stdlib.array.is_empty");
-      });
+    test("should stop at non-word characters", () => {
+      const result = extractFullIdentifier("stdlib.array.is_empty(", 18);
+      assert.strictEqual(result, "stdlib.array.is_empty");
     });
 
-    suite("when identifier has multiple depth namespaces", () => {
-      let result: string | null;
-
-      setup(() => {
-        result = extractFullIdentifier("_testing.mock.assert.equals", 27);
-      });
-
-      test("should handle multiple depth namespaces", () => {
-        assert.strictEqual(result, "_testing.mock.assert.equals");
-      });
+    test("should handle multiple depth namespaces", () => {
+      const result = extractFullIdentifier("_testing.mock.assert.equals", 27);
+      assert.strictEqual(result, "_testing.mock.assert.equals");
     });
 
-    suite("when position is in middle of identifier", () => {
-      let result: string | null;
-
-      setup(() => {
-        result = extractFullIdentifier("stdlib.array.is_empty", 10);
-      });
-
-      test("should handle position in middle of identifier", () => {
-        assert.strictEqual(result, "stdlib.array.is_empty");
-      });
+    test("should handle position in middle of identifier", () => {
+      const result = extractFullIdentifier("stdlib.array.is_empty", 10);
+      assert.strictEqual(result, "stdlib.array.is_empty");
     });
   });
 
@@ -159,142 +103,58 @@ suite("Hover Provider Test Suite", () => {
       },
     ];
 
-    suite("when finding by full qualified name", () => {
-      let result: ShdocFunction | null;
-
-      setup(() => {
-        result = findFunction(mockFunctions, "stdlib.array.is_empty");
-      });
-
-      test("should find function", () => {
-        assert.ok(result);
-      });
-
-      test("should have correct name", () => {
-        assert.strictEqual(result?.name, "is_empty");
-      });
-
-      test("should have correct namespace", () => {
-        assert.strictEqual(result?.namespace, "stdlib.array");
-      });
+    test("should find function by full qualified name", () => {
+      const result = findFunction(mockFunctions, "stdlib.array.is_empty");
+      assert.ok(result);
+      assert.strictEqual(result?.name, "is_empty");
+      assert.strictEqual(result?.namespace, "stdlib.array");
     });
 
-    suite("when finding by partial name", () => {
-      let result: ShdocFunction | null;
-
-      setup(() => {
-        result = findFunction(mockFunctions, "is_empty");
-      });
-
-      test("should find function", () => {
-        assert.ok(result);
-      });
-
-      test("should have correct name", () => {
-        assert.strictEqual(result?.name, "is_empty");
-      });
+    test("should find function by partial name", () => {
+      const result = findFunction(mockFunctions, "is_empty");
+      assert.ok(result);
+      assert.strictEqual(result?.name, "is_empty");
     });
 
-    suite("when finding root level function", () => {
-      let result: ShdocFunction | null;
-
-      setup(() => {
-        result = findFunction(mockFunctions, "root_func");
-      });
-
-      test("should find function", () => {
-        assert.ok(result);
-      });
-
-      test("should have correct name", () => {
-        assert.strictEqual(result?.name, "root_func");
-      });
-
-      test("should have no namespace", () => {
-        assert.strictEqual(result?.namespace, undefined);
-      });
+    test("should find root level function by name", () => {
+      const result = findFunction(mockFunctions, "root_func");
+      assert.ok(result);
+      assert.strictEqual(result?.name, "root_func");
+      assert.strictEqual(result?.namespace, undefined);
     });
 
-    suite("when finding deeply namespaced function", () => {
-      let result: ShdocFunction | null;
-
-      setup(() => {
-        result = findFunction(mockFunctions, "_testing.assert.assert");
-      });
-
-      test("should find function", () => {
-        assert.ok(result);
-      });
-
-      test("should have correct name", () => {
-        assert.strictEqual(result?.name, "assert");
-      });
-
-      test("should have correct namespace", () => {
-        assert.strictEqual(result?.namespace, "_testing.assert");
-      });
+    test("should find deeply namespaced function", () => {
+      const result = findFunction(mockFunctions, "_testing.assert.assert");
+      assert.ok(result);
+      assert.strictEqual(result?.name, "assert");
+      assert.strictEqual(result?.namespace, "_testing.assert");
     });
 
-    suite("when function does not exist", () => {
-      let result: ShdocFunction | null;
-
-      setup(() => {
-        result = findFunction(mockFunctions, "nonexistent");
-      });
-
-      test("should return null", () => {
-        assert.strictEqual(result, null);
-      });
+    test("should return null for non-existent function", () => {
+      const result = findFunction(mockFunctions, "nonexistent");
+      assert.strictEqual(result, null);
     });
 
-    suite("when partial non-existent namespace", () => {
-      let result: ShdocFunction | null;
-
-      setup(() => {
-        result = findFunction(mockFunctions, "stdlib.string.missing");
-      });
-
-      test("should return null", () => {
-        assert.strictEqual(result, null);
-      });
+    test("should return null for partial non-existent namespace", () => {
+      const result = findFunction(mockFunctions, "stdlib.string.missing");
+      assert.strictEqual(result, null);
     });
 
-    suite("when multiple matches exist", () => {
-      let result: ShdocFunction | null;
-
-      setup(() => {
-        result = findFunction(mockFunctions, "join");
-      });
-
-      test("should prioritize full qualified name match over partial", () => {
-        assert.ok(result);
-        assert.strictEqual(result?.name, "join");
-      });
+    test("should prioritize full qualified name match over partial", () => {
+      const result = findFunction(mockFunctions, "join");
+      assert.ok(result);
+      assert.strictEqual(result?.name, "join");
     });
 
-    suite("when function list is empty", () => {
-      let result: ShdocFunction | null;
-
-      setup(() => {
-        result = findFunction([], "stdlib.array.is_empty");
-      });
-
-      test("should return null", () => {
-        assert.strictEqual(result, null);
-      });
+    test("should handle empty function list", () => {
+      const result = findFunction([], "stdlib.array.is_empty");
+      assert.strictEqual(result, null);
     });
 
-    suite("when namespace contains underscores", () => {
-      let result: ShdocFunction | null;
-
-      setup(() => {
-        result = findFunction(mockFunctions, "_testing.assert.assert");
-      });
-
-      test("should find function", () => {
-        assert.ok(result);
-        assert.strictEqual(result?.namespace, "_testing.assert");
-      });
+    test("should find function with underscores in namespace", () => {
+      const result = findFunction(mockFunctions, "_testing.assert.assert");
+      assert.ok(result);
+      assert.strictEqual(result?.namespace, "_testing.assert");
     });
   });
 });

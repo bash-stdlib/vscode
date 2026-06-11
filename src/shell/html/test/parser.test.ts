@@ -122,7 +122,7 @@ suite("HTML Parser Test Suite", () => {
       assert.strictEqual(functions.length, 1);
     });
 
-    test("it should correctly extract all arguments", () => {
+    test("it should correctly extract all arguments even with auto-generated IDs", () => {
       assert.strictEqual(firstFunction.args.length, 2);
     });
 
@@ -130,7 +130,7 @@ suite("HTML Parser Test Suite", () => {
       assert.strictEqual(firstFunction.args[1].name, "$2");
     });
 
-    test("it should correctly extract exit codes", () => {
+    test("it should correctly extract exit codes even with auto-generated IDs", () => {
       assert.strictEqual(firstFunction.exitcodes.length, 1);
     });
 
@@ -144,7 +144,6 @@ suite("HTML Parser Test Suite", () => {
 
     setup(() => {
       const html = loadAsset("testing_functions.html");
-
       functions = parser.parse(html, { isTesting: true });
     });
 
@@ -155,60 +154,57 @@ suite("HTML Parser Test Suite", () => {
     test("it should correctly extract assert_is_array and assign it to the root namespace", () => {
       const fn = functions.find((f) => f.name === "assert_is_array");
       assert.ok(fn);
-      assert.strictEqual(fn?.namespace, "");
-    });
-
-    test("assert_is_array should be marked as testing", () => {
-      const fn = functions.find((f) => f.name === "assert_is_array");
-      assert.strictEqual(fn?.isTesting, true);
+      assert.strictEqual(fn.namespace, "");
+      assert.strictEqual(fn.isTesting, true);
     });
 
     test("it should correctly extract _testing.error and assign it to _testing namespace", () => {
       const fn = functions.find((f) => f.name === "error");
       assert.ok(fn);
-      assert.strictEqual(fn?.namespace, "_testing");
+      assert.strictEqual(fn.namespace, "_testing");
     });
 
-    test("it should include variadic ellipsis arguments in the args list", () => {
+    test("it should skip variadic ellipsis arguments from the args list", () => {
       const fn = functions.find((f) => f.name === "error");
-      assert.strictEqual(fn?.args.length, 1);
-      assert.strictEqual(fn?.args[0].name, "…");
+      assert.ok(fn);
+      // The _testing.error function has variadic args (…), which are kept in the args list for documentation purposes
+      assert.strictEqual(fn.args.length, 1);
+      assert.strictEqual(fn.args[0].name, "…");
     });
 
     test("it should correctly extract @parametrize and assign it to no namespace if it has no dot", () => {
       const fn = functions.find((f) => f.name === "@parametrize");
       assert.ok(fn);
-      assert.strictEqual(fn?.namespace, "");
+      assert.strictEqual(fn.namespace, "");
     });
 
     test("it should extract keywords from the function section", () => {
       const fn = functions.find((f) => f.name === "@parametrize");
-      assert.strictEqual(fn?.keywords.length, 1);
-    });
-
-    test("extracted keyword should have correct name", () => {
-      const fn = functions.find((f) => f.name === "@parametrize");
+      assert.ok(fn);
+      assert.strictEqual(fn.keywords.length, 1);
       assert.strictEqual(
-        fn?.keywords[0].name,
+        fn.keywords[0].name,
         "STDLIB_TESTING_PARAMETRIZE_SETTING_DEBUG_BOOLEAN",
       );
-    });
-
-    test("extracted keyword should have correct type", () => {
-      const fn = functions.find((f) => f.name === "@parametrize");
-      assert.strictEqual(fn?.keywords[0].type, "boolean");
+      assert.strictEqual(fn.keywords[0].type, "boolean");
+      assert.strictEqual(
+        fn.keywords[0].desc,
+        "Whether to show debug information (default=”0”).",
+      );
     });
 
     test("it should extract globals from the function section", () => {
       const fn = functions.find((f) => f.name === "@parametrize");
-      assert.strictEqual(fn?.globals.length, 1);
-    });
-
-    test("extracted global should have correct name", () => {
-      const fn = functions.find((f) => f.name === "@parametrize");
+      assert.ok(fn);
+      assert.strictEqual(fn.globals.length, 1);
       assert.strictEqual(
-        fn?.globals[0].name,
+        fn.globals[0].name,
         "STDLIB_TESTING_THEME_PARAMETRIZE_HIGHLIGHT",
+      );
+      assert.strictEqual(fn.globals[0].type, "string");
+      assert.strictEqual(
+        fn.globals[0].desc,
+        "A theme colour used to highlight informational messages (default=”LIGHT_BLUE”).",
       );
     });
 
@@ -216,8 +212,10 @@ suite("HTML Parser Test Suite", () => {
       const fn = functions.find(
         (f) => f.name === "error" && f.namespace === "_testing",
       );
-      assert.strictEqual(fn?.globals.length, 1);
-      assert.strictEqual(fn?.globals[0].name, "STDLIB_TESTING_THEME_ERROR");
+      assert.ok(fn);
+      assert.strictEqual(fn.globals.length, 1);
+      assert.strictEqual(fn.globals[0].name, "STDLIB_TESTING_THEME_ERROR");
+      assert.strictEqual(fn.globals[0].type, "string");
     });
   });
 

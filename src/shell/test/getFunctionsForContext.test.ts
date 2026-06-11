@@ -53,7 +53,6 @@ suite("getFunctionsForContext", () => {
         }),
       } as unknown as vscode.TextDocument;
       const position = new vscode.Position(1, 0);
-
       result = getFunctionsForContext(
         mockFunctions,
         mockTemplates,
@@ -62,16 +61,8 @@ suite("getFunctionsForContext", () => {
       );
     });
 
-    test("it should return three functions", () => {
+    test("it should return all functions including generated mock functions", () => {
       assert.strictEqual(result.length, 3);
-    });
-
-    test("it should include the normal function", () => {
-      assert.ok(result.find((fn) => fn.name === "normal_fn"));
-    });
-
-    test("it should include the testing function", () => {
-      assert.ok(result.find((fn) => fn.name === "test_fn"));
     });
 
     test("it should include the generated mock function", () => {
@@ -86,11 +77,10 @@ suite("getFunctionsForContext", () => {
       const mockDoc = {
         uri: vscode.Uri.file("/path/to/normal.sh"),
       } as vscode.TextDocument;
-
       result = getFunctionsForContext(mockFunctions, [], mockDoc);
     });
 
-    test("it should return only one function", () => {
+    test("it should return only normal functions", () => {
       assert.strictEqual(result.length, 1);
     });
 

@@ -73,7 +73,6 @@ suite("Completion Provider Test Suite", () => {
         content: "s",
       });
       const position = new vscode.Position(0, 1);
-
       const result = await provider.provideCompletionItems(
         document,
         position,
@@ -86,14 +85,10 @@ suite("Completion Provider Test Suite", () => {
       completions = (result as vscode.CompletionItem[]) || [];
     });
 
-    test("it should return stdlib namespace", () => {
+    test("it should return root namespaces matching the prefix", () => {
       const stdlib = completions.find((c) => c.label === "stdlib");
       assert.ok(stdlib);
-    });
-
-    test("stdlib item should have module kind", () => {
-      const stdlib = completions.find((c) => c.label === "stdlib");
-      assert.strictEqual(stdlib?.kind, vscode.CompletionItemKind.Module);
+      assert.strictEqual(stdlib.kind, vscode.CompletionItemKind.Module);
     });
 
     test("it should not return namespaces that do not match the prefix", () => {
@@ -111,7 +106,6 @@ suite("Completion Provider Test Suite", () => {
         content: "stdlib.",
       });
       const position = new vscode.Position(0, 7);
-
       const result = await provider.provideCompletionItems(
         document,
         position,
@@ -124,13 +118,10 @@ suite("Completion Provider Test Suite", () => {
       completions = (result as vscode.CompletionItem[]) || [];
     });
 
-    test("it should return string sub-namespace", () => {
+    test("it should return sub-namespaces", () => {
       const stringNs = completions.find((c) => c.label === "string");
-      assert.ok(stringNs);
-    });
-
-    test("it should return array sub-namespace", () => {
       const arrayNs = completions.find((c) => c.label === "array");
+      assert.ok(stringNs);
       assert.ok(arrayNs);
     });
   });
@@ -144,7 +135,6 @@ suite("Completion Provider Test Suite", () => {
         content: "stdlib.string.",
       });
       const position = new vscode.Position(0, 14);
-
       const result = await provider.provideCompletionItems(
         document,
         position,
@@ -157,25 +147,19 @@ suite("Completion Provider Test Suite", () => {
       completions = (result as vscode.CompletionItem[]) || [];
     });
 
-    test("it should return join function", () => {
+    test("it should return functions in that namespace", () => {
       const joinFn = completions.find(
         (c) => c.label === "join" || c.label === "stdlib.string.join",
       );
-      assert.ok(joinFn);
-    });
-
-    test("join function should have function kind", () => {
-      const joinFn = completions.find(
-        (c) => c.label === "join" || c.label === "stdlib.string.join",
-      );
-      assert.strictEqual(joinFn?.kind, vscode.CompletionItemKind.Function);
-    });
-
-    test("it should return split function", () => {
       const splitFn = completions.find(
         (c) => c.label === "split" || c.label === "stdlib.string.split",
       );
+      assert.ok(
+        joinFn,
+        `join not found in: ${completions.map((c) => c.label).join(", ")}`,
+      );
       assert.ok(splitFn);
+      assert.strictEqual(joinFn.kind, vscode.CompletionItemKind.Function);
     });
   });
 
@@ -185,8 +169,8 @@ suite("Completion Provider Test Suite", () => {
     setup(async () => {
       const testFilePath = path.join(__dirname, "assets/context-aware.test.sh");
       const document = await vscode.workspace.openTextDocument(testFilePath);
-      const position = new vscode.Position(0, 0);
 
+      const position = new vscode.Position(0, 0); // content doesn't matter much for this test
       const result = await provider.provideCompletionItems(
         document,
         position,

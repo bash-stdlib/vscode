@@ -32,52 +32,37 @@ suite("generateMockFunctions", () => {
     },
   ];
 
-  suite("when generating mock functions", () => {
-    let generated: ShdocFunction[];
+  test("it should replace 'object' with mock name in function names", () => {
     const mockName = "myMock";
+    const generated = generateMockFunctions(templates, mockName);
 
-    setup(() => {
-      generated = generateMockFunctions(templates, mockName);
-    });
+    assert.strictEqual(generated[0].name, "myMock");
+    assert.strictEqual(generated[1].name, "clear");
+  });
 
-    test("it should replace 'object' with mock name in first function name", () => {
-      assert.strictEqual(generated[0].name, "myMock");
-    });
+  test("it should replace 'object' with mock name in namespaces", () => {
+    const mockName = "myMock";
+    const generated = generateMockFunctions(templates, mockName);
 
-    test("it should keep name of other functions", () => {
-      assert.strictEqual(generated[1].name, "clear");
-    });
+    assert.strictEqual(generated[0].namespace, "");
+    assert.strictEqual(generated[1].namespace, "myMock.mock");
+  });
 
-    test("it should leave empty namespace as is", () => {
-      assert.strictEqual(generated[0].namespace, "");
-    });
+  test("it should replace 'object' in descriptions", () => {
+    const mockName = "myMock";
+    const generated = generateMockFunctions(templates, mockName);
 
-    test("it should replace 'object' with mock name in non-empty namespaces", () => {
-      assert.strictEqual(generated[1].namespace, "myMock.mock");
-    });
+    assert.strictEqual(generated[0].description, "A mock for myMock.");
+    assert.strictEqual(generated[1].description, "Clears myMock mock.");
+  });
 
-    test("it should replace 'object' in function descriptions", () => {
-      assert.strictEqual(generated[0].description, "A mock for myMock.");
-    });
+  test("it should replace 'object' in arguments, globals and keywords", () => {
+    const mockName = "myMock";
+    const generated = generateMockFunctions(templates, mockName);
 
-    test("it should replace 'object' in other function descriptions", () => {
-      assert.strictEqual(generated[1].description, "Clears myMock mock.");
-    });
-
-    test("it should replace 'object' in arguments description", () => {
-      assert.strictEqual(generated[0].args[0].desc, "Arg for myMock");
-    });
-
-    test("it should replace 'object' in global variable name", () => {
-      assert.strictEqual(generated[0].globals[0].name, "_myMock_mock_rc");
-    });
-
-    test("it should replace 'object' in global variable description", () => {
-      assert.strictEqual(generated[0].globals[0].desc, "RC for myMock");
-    });
-
-    test("it should replace 'object' in keyword description", () => {
-      assert.strictEqual(generated[0].keywords[0].desc, "Keyword for myMock");
-    });
+    assert.strictEqual(generated[0].args[0].desc, "Arg for myMock");
+    assert.strictEqual(generated[0].globals[0].name, "_myMock_mock_rc");
+    assert.strictEqual(generated[0].globals[0].desc, "RC for myMock");
+    assert.strictEqual(generated[0].keywords[0].desc, "Keyword for myMock");
   });
 });

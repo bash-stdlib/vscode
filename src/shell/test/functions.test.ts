@@ -63,7 +63,6 @@ suite("loadFunctions Test Suite", () => {
     };
 
     const result = await loadFunctions();
-
     allFunctions = result.allFunctions;
     mockTemplates = result.mockTemplates;
 
@@ -72,37 +71,24 @@ suite("loadFunctions Test Suite", () => {
     HtmlDocumentationParser.prototype.parse = originalParserParse;
   });
 
-  suite("when functions are loaded", () => {
-    test("it should load 2 functions", () => {
-      assert.strictEqual(allFunctions.length, 2);
-    });
+  test("it should load 2 functions", () => {
+    assert.strictEqual(allFunctions.length, 2);
+  });
 
-    test("it should include a normal function", () => {
-      const normalFn = allFunctions.find((fn) => !fn.isTesting);
-      assert.ok(normalFn);
-    });
+  test("it should include a normal function", () => {
+    const normalFn = allFunctions.find((fn) => !fn.isTesting);
+    assert.ok(normalFn);
+    assert.strictEqual(normalFn.name, "normal_fn");
+  });
 
-    test("it should have correct name for normal function", () => {
-      const normalFn = allFunctions.find((fn) => !fn.isTesting);
-      assert.strictEqual(normalFn?.name, "normal_fn");
-    });
+  test("it should include a testing function", () => {
+    const testFn = allFunctions.find((fn) => fn.isTesting);
+    assert.ok(testFn);
+    assert.strictEqual(testFn.name, "test_fn");
+  });
 
-    test("it should include a testing function", () => {
-      const testFn = allFunctions.find((fn) => fn.isTesting);
-      assert.ok(testFn);
-    });
-
-    test("it should have correct name for testing function", () => {
-      const testFn = allFunctions.find((fn) => fn.isTesting);
-      assert.strictEqual(testFn?.name, "test_fn");
-    });
-
-    test("it should include one mock template", () => {
-      assert.strictEqual(mockTemplates.length, 1);
-    });
-
-    test("it should have correct name for mock template", () => {
-      assert.strictEqual(mockTemplates[0].name, "object");
-    });
+  test("it should include mock templates", () => {
+    assert.strictEqual(mockTemplates.length, 1);
+    assert.strictEqual(mockTemplates[0].name, "object");
   });
 });

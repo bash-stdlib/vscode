@@ -33,148 +33,76 @@ suite("getActiveMocks", () => {
     } as unknown as vscode.TextDocument;
   }
 
-  suite("when no mocks are created", () => {
-    let activeMocks: string[];
-
-    setup(() => {
-      const content = "echo hello";
-      const document = createMockDocument(content);
-      const position = new vscode.Position(0, 10);
-
-      activeMocks = getActiveMocks(document, position);
-    });
-
-    test("then it should return an empty array", () => {
-      assert.strictEqual(activeMocks.length, 0);
-    });
+  test("when no mocks are created", () => {
+    const content = "echo hello";
+    const document = createMockDocument(content);
+    const position = new vscode.Position(0, 10);
+    const activeMocks = getActiveMocks(document, position);
+    assert.strictEqual(activeMocks.length, 0);
   });
 
-  suite("when a mock is created", () => {
-    let activeMocks: string[];
-
-    setup(() => {
-      const content = "_mock.create example\n";
-      const document = createMockDocument(content);
-      const position = new vscode.Position(1, 0);
-
-      activeMocks = getActiveMocks(document, position);
-    });
-
-    test("then it should return the mock name", () => {
-      assert.deepStrictEqual(activeMocks, ["example"]);
-    });
+  test("when a mock is created", () => {
+    const content = "_mock.create example\n";
+    const document = createMockDocument(content);
+    const position = new vscode.Position(1, 0);
+    const activeMocks = getActiveMocks(document, position);
+    assert.deepStrictEqual(activeMocks, ["example"]);
   });
 
-  suite("when multiple mocks are created", () => {
-    let activeMocks: string[];
-
-    setup(() => {
-      const content = "_mock.create example1\n_mock.create example2\n";
-      const document = createMockDocument(content);
-      const position = new vscode.Position(2, 0);
-
-      activeMocks = getActiveMocks(document, position);
-    });
-
-    test("then it should return all mock names", () => {
-      assert.deepStrictEqual(activeMocks, ["example1", "example2"]);
-    });
+  test("when multiple mocks are created", () => {
+    const content = "_mock.create example1\n_mock.create example2\n";
+    const document = createMockDocument(content);
+    const position = new vscode.Position(2, 0);
+    const activeMocks = getActiveMocks(document, position);
+    assert.deepStrictEqual(activeMocks, ["example1", "example2"]);
   });
 
-  suite("when a mock is deleted", () => {
-    let activeMocks: string[];
-
-    setup(() => {
-      const content = "_mock.create example\n_mock.delete example\n";
-      const document = createMockDocument(content);
-      const position = new vscode.Position(2, 0);
-
-      activeMocks = getActiveMocks(document, position);
-    });
-
-    test("then it should return an empty array", () => {
-      assert.strictEqual(activeMocks.length, 0);
-    });
+  test("when a mock is deleted", () => {
+    const content = "_mock.create example\n_mock.delete example\n";
+    const document = createMockDocument(content);
+    const position = new vscode.Position(2, 0);
+    const activeMocks = getActiveMocks(document, position);
+    assert.strictEqual(activeMocks.length, 0);
   });
 
-  suite("when mocks are created and deleted selectively", () => {
-    let activeMocks: string[];
-
-    setup(() => {
-      const content =
-        "_mock.create example1\n_mock.create example2\n_mock.delete example1\n";
-      const document = createMockDocument(content);
-      const position = new vscode.Position(3, 0);
-
-      activeMocks = getActiveMocks(document, position);
-    });
-
-    test("then it should return only the active mock names", () => {
-      assert.deepStrictEqual(activeMocks, ["example2"]);
-    });
+  test("when mocks are created and deleted selectively", () => {
+    const content =
+      "_mock.create example1\n_mock.create example2\n_mock.delete example1\n";
+    const document = createMockDocument(content);
+    const position = new vscode.Position(3, 0);
+    const activeMocks = getActiveMocks(document, position);
+    assert.deepStrictEqual(activeMocks, ["example2"]);
   });
 
-  suite("when checking before mock creation", () => {
-    let activeMocks: string[];
-
-    setup(() => {
-      const content = "echo hello\n_mock.create example\n";
-      const document = createMockDocument(content);
-      const position = new vscode.Position(0, 10);
-
-      activeMocks = getActiveMocks(document, position);
-    });
-
-    test("then it should return an empty array", () => {
-      assert.strictEqual(activeMocks.length, 0);
-    });
+  test("when checking before mock creation", () => {
+    const content = "echo hello\n_mock.create example\n";
+    const document = createMockDocument(content);
+    const position = new vscode.Position(0, 10);
+    const activeMocks = getActiveMocks(document, position);
+    assert.strictEqual(activeMocks.length, 0);
   });
 
-  suite("when checking between creation and deletion", () => {
-    let activeMocks: string[];
-
-    setup(() => {
-      const content = "_mock.create example\n\n_mock.delete example\n";
-      const document = createMockDocument(content);
-      const position = new vscode.Position(1, 0);
-
-      activeMocks = getActiveMocks(document, position);
-    });
-
-    test("then it should return the active mock name", () => {
-      assert.deepStrictEqual(activeMocks, ["example"]);
-    });
+  test("when checking between creation and deletion", () => {
+    const content = "_mock.create example\n\n_mock.delete example\n";
+    const document = createMockDocument(content);
+    const position = new vscode.Position(1, 0);
+    const activeMocks = getActiveMocks(document, position);
+    assert.deepStrictEqual(activeMocks, ["example"]);
   });
 
-  suite("when mock creation is commented out", () => {
-    let activeMocks: string[];
-
-    setup(() => {
-      const content = "# _mock.create example\n";
-      const document = createMockDocument(content);
-      const position = new vscode.Position(1, 0);
-
-      activeMocks = getActiveMocks(document, position);
-    });
-
-    test("then it should return an empty array", () => {
-      assert.strictEqual(activeMocks.length, 0);
-    });
+  test("when mock creation is commented out", () => {
+    const content = "# _mock.create example\n";
+    const document = createMockDocument(content);
+    const position = new vscode.Position(1, 0);
+    const activeMocks = getActiveMocks(document, position);
+    assert.strictEqual(activeMocks.length, 0);
   });
 
-  suite("when mock creation has a trailing comment", () => {
-    let activeMocks: string[];
-
-    setup(() => {
-      const content = "_mock.create example # this is a comment\n";
-      const document = createMockDocument(content);
-      const position = new vscode.Position(1, 0);
-
-      activeMocks = getActiveMocks(document, position);
-    });
-
-    test("then it should return the mock name", () => {
-      assert.deepStrictEqual(activeMocks, ["example"]);
-    });
+  test("when mock creation has a trailing comment", () => {
+    const content = "_mock.create example # this is a comment\n";
+    const document = createMockDocument(content);
+    const position = new vscode.Position(1, 0);
+    const activeMocks = getActiveMocks(document, position);
+    assert.deepStrictEqual(activeMocks, ["example"]);
   });
 });
