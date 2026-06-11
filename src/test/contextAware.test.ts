@@ -16,6 +16,7 @@ suite("Context Aware Completion Integration Test Suite", () => {
   suite("when extension is activated", () => {
     setup(async () => {
       const extension = getExtension();
+
       await extension?.activate();
     });
 
@@ -44,6 +45,7 @@ suite("Context Aware Completion Integration Test Suite", () => {
           const namespaceItems = completions?.items.filter(
             (item) => item.kind === vscode.CompletionItemKind.Module,
           );
+
           assert.ok(
             namespaceItems &&
               namespaceItems.some((item) => item.label === "array"),
@@ -60,6 +62,7 @@ suite("Context Aware Completion Integration Test Suite", () => {
               language: "shellscript",
               content: "_te",
             });
+
             completions = await getCompletionsAt(doc, 0, 3);
           });
 
@@ -67,6 +70,7 @@ suite("Context Aware Completion Integration Test Suite", () => {
             const testingItem = completions?.items.find(
               (item) => item.label === "_testing",
             );
+
             assert.ok(!testingItem);
           });
         });
@@ -79,6 +83,7 @@ suite("Context Aware Completion Integration Test Suite", () => {
       setup(async () => {
         const uri = vscode.Uri.parse("untitled:my_test_script.sh");
         document = await vscode.workspace.openTextDocument(uri);
+
         await vscode.languages.setTextDocumentLanguage(document, "shellscript");
       });
 
@@ -87,6 +92,7 @@ suite("Context Aware Completion Integration Test Suite", () => {
 
         setup(async () => {
           await insertText(document, "_te");
+
           completions = await getCompletionsAt(document, 0, 3);
         });
 
@@ -94,6 +100,7 @@ suite("Context Aware Completion Integration Test Suite", () => {
           const testingItem = completions?.items.find(
             (item) => item.label === "_testing",
           );
+
           assert.ok(testingItem);
         });
       });
@@ -104,6 +111,7 @@ suite("Context Aware Completion Integration Test Suite", () => {
         setup(async () => {
           await clearDocument(document);
           await insertText(document, "std");
+
           completions = await getCompletionsAt(document, 0, 3);
         });
 
@@ -111,6 +119,7 @@ suite("Context Aware Completion Integration Test Suite", () => {
           const stdlibItem = completions?.items.find(
             (item) => item.label === "stdlib",
           );
+
           assert.ok(stdlibItem);
         });
       });

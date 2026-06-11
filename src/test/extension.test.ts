@@ -11,6 +11,7 @@ const getCompletionsForContent = async (options: {
     language: "shellscript",
     content: options.content,
   });
+
   return getCompletionsAt(document, options.line, options.character);
 };
 
@@ -24,6 +25,7 @@ const getHoversForContent = async (options: {
     content: options.content,
   });
   const position = new vscode.Position(options.line, options.character);
+
   return vscode.commands.executeCommand<vscode.Hover[]>(
     "vscode.executeHoverProvider",
     document.uri,
@@ -50,6 +52,7 @@ suite("Extension Test Suite", () => {
 
     setup(async () => {
       extension = getExtension();
+
       await extension?.activate();
       await vscode.workspace
         .getConfiguration("bash-stdlib")

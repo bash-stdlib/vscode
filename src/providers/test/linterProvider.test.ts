@@ -53,11 +53,22 @@ suite("LinterProvider Test Suite", () => {
       await (linterProvider as any).runLinterForFiles([filePath]);
     });
 
-    test("it should pass extra namespaces, extra functions and ignored codes to runLinter", () => {
+    test("it should call runLinter once", () => {
       assert.ok(runLinterStub.calledOnce);
+    });
+
+    test("it should pass extra namespaces to runLinter", () => {
       const args = runLinterStub.lastCall.args;
       assert.deepStrictEqual(args[3], ["extra"]);
+    });
+
+    test("it should pass extra functions to runLinter", () => {
+      const args = runLinterStub.lastCall.args;
       assert.deepStrictEqual(args[4], ["extraFunc"]);
+    });
+
+    test("it should pass ignored codes to runLinter", () => {
+      const args = runLinterStub.lastCall.args;
       assert.deepStrictEqual(args[5], ["SC1090"]);
     });
   });
